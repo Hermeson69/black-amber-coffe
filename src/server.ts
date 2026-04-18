@@ -3,6 +3,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import express from "express";
 import { healthRoutes } from "./routes/health.routes";
+import {authRoutes} from "./routes/auth.routes"
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,7 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(healthRoutes);
+app.use("/api", authRoutes);
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on PORT ${PORT}`);
