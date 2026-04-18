@@ -8,6 +8,13 @@
       "when": 1776527930150,
       "tag": "0000_nosy_thunderball",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776541692267,
+      "tag": "0001_chemical_thunderbolt",
+      "breakpoints": true
     }
   ]
 }
