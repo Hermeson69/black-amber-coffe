@@ -1,10 +1,10 @@
 {
-  "name": "black-ember-coffee-backend",
+  "name": "black-amber-coffee",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "module",
+  "type": "commonjs",
   "main": "src/server.ts",
   "scripts": {
     "build": "tsc",
@@ -15,12 +15,13 @@
     "db:reset": "rm -f src/db/database.sqlite && npm run migrate-up"
   },
   "dependencies": {
-    "@libsql/client": "^0.15.15",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.20.0",
+    "postgres": "^3.4.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuidv7": "^1.0.2",
