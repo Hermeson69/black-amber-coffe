@@ -2,7 +2,7 @@ import "dotenv/config";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import express from "express";
-
+import { healthRoutes } from "./routes/health.routes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,7 +28,7 @@ const swaggerOptions = {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
-          description: "Insira o token JWT obtido no login"
+          description: "Insira o token JWT obtido no login",
         },
       },
     },
@@ -39,6 +39,7 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(healthRoutes);
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on PORT ${PORT}`);
