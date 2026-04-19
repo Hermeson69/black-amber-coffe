@@ -15,6 +15,20 @@
       "when": 1776541692267,
       "tag": "0001_chemical_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1776541692268,
+      "tag": "0002_drop_clients_last_login",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776616254976,
+      "tag": "0003_narrow_colossus",
+      "breakpoints": true
     }
   ]
 }
