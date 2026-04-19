@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { Clients } from "../../db/schema";
 
 export const RegisterClientSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -13,24 +12,39 @@ export const LoginClientSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-export const SignupSchema = RegisterClientSchema;
 
-export const ClentResponseSchema = z.object({
-  publicId: z.string(),
-  name: z.string(),
-  email: z.email(),
+export const ProfileResponseSchema = z.object({
+  fullName: z.string(),
+  avatarImage: z.string().nullable(),
   createdAt: z.string(),
-  updatedAt: z.string(),
-  lastLogin: z.string(),
 });
 
-export const AuthResponseSchema = z.object({
-  token: z.string(),
-  client: ClentResponseSchema,
+export const RegisterResponseSchema = z.object({
+  data: z.object({
+    publicId: z.string(),
+    email: z.email(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    name: z.string(),
+    profile: ProfileResponseSchema,
+  }),
 });
+
+export const LoginResponseSchema = z.object({
+  data: z.object({
+    accessToken: z.string(),
+    refreshToken: z.string(),
+    user: z.object({
+      publicId: z.string(),
+      email: z.email(),
+      profile: ProfileResponseSchema,
+    }),
+  }),
+});
+
 
 export type RegisterInput = z.infer<typeof RegisterClientSchema>;
-export type SignupInput = z.infer<typeof SignupSchema>;
+export type ProfileResponse = z.infer<typeof ProfileResponseSchema>;
+export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 export type LoginInput = z.infer<typeof LoginClientSchema>;
-export type ClientResponse = z.infer<typeof ClentResponseSchema>;
-export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+export type LoginResponse = z.infer<typeof LoginResponseSchema>;

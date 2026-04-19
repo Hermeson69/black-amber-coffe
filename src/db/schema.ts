@@ -1,4 +1,4 @@
-import { pgTable, serial, text, numeric } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer } from "drizzle-orm/pg-core";
 
 export const Clients = pgTable("clients", {
   id: serial("id").primaryKey(),
@@ -9,5 +9,13 @@ export const Clients = pgTable("clients", {
   phone: text("phone"),
   createdAt: text().notNull(),
   updatedAt: text().notNull(),
-  lastLogin: text().notNull(),
+});
+
+export const Profiles = pgTable("profiles", {
+  id: serial("id").primaryKey(),
+  clientId: integer("client_id").notNull(),
+  fullName: text("full_name").notNull(),
+  avatarImage: text("avatar_image"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });

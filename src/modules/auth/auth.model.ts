@@ -1,6 +1,5 @@
 import { RegisterInput } from "./auth.schema";
 import { generateId } from "../../core/gereteId";
-import { types } from "util";
 
 export default class authModel {
   id: number;
@@ -8,9 +7,9 @@ export default class authModel {
   name: string;
   email: string;
   password: string;
+  phone?: string;
   createdAt: string;
   updatedAt: string;
-  lastLogin: string;
 
   constructor(
     id: number,
@@ -18,16 +17,16 @@ export default class authModel {
     name: string,
     email: string,
     password: string,
-    phone: string,
+    phone?: string,
     createdAt?: Date | string,
     updatedAt?: Date | string,
-    lastLogin?: Date | string,
   ) {
     this.id = id;
     this.publicId = publicId;
     this.name = name;
     this.email = email;
     this.password = password;
+    this.phone = phone;
     this.createdAt =
       typeof createdAt === "string"
         ? createdAt
@@ -36,10 +35,6 @@ export default class authModel {
       typeof updatedAt === "string"
         ? updatedAt
         : (updatedAt ?? new Date()).toISOString();
-    this.lastLogin =
-      typeof lastLogin === "string"
-        ? lastLogin
-        : (lastLogin ?? new Date()).toISOString();
   }
 
   static fromCreateData(data: RegisterInput): authModel {
@@ -50,7 +45,7 @@ export default class authModel {
       data.name,
       data.email,
       data.password,
-      now.toISOString(),
+      data.phone,
       now.toISOString(),
       now.toISOString(),
     );

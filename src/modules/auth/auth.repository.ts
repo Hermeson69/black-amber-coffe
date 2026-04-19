@@ -1,7 +1,8 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import {eq} from "drizzle-orm"
+import { eq } from "drizzle-orm";
 import { Clients } from "../../db/schema";
 import authModel from "./auth.model";
+import { LoginInput } from "./auth.schema";
 
 export default class authRepository {
   db: ReturnType<typeof drizzle>;
@@ -16,9 +17,9 @@ export default class authRepository {
       name: data.name,
       email: data.email,
       password: data.password,
+      phone: data.phone,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
-      lastLogin: data.lastLogin,
     };
 
     const [inserted] = await this.db
@@ -32,12 +33,15 @@ export default class authRepository {
       inserted.name,
       inserted.email,
       inserted.password,
+      inserted.phone ?? undefined,
       inserted.createdAt,
       inserted.updatedAt,
     );
   }
 
-    async getByEmail(email: string): Promise<authModel | null> {
+  
+
+  async getByEmail(email: string): Promise<authModel | null> {
     const [client] = await this.db
       .select()
       .from(Clients)
@@ -54,6 +58,7 @@ export default class authRepository {
       client.name,
       client.email,
       client.password,
+      client.phone ?? undefined,
       client.createdAt,
       client.updatedAt,
     );
