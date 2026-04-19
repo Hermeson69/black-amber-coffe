@@ -3,12 +3,26 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import express from "express";
 import { healthRoutes } from "./routes/health.routes";
-import {authRoutes} from "./routes/auth.routes"
+import { authRoutes } from "./routes/auth.routes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  const start = process.hrtime.bigint();
+  const startedAt = new Date().toISOString();
+
+  res.on("finish", () => {
+    const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
+    console.log(
+      `${startedAt} | ${req.method} ${req.originalUrl} | ${res.statusCode} | ${durationMs.toFixed(2)} ms`,
+    );
+  });
+
+  next();
+});
 
 const swaggerOptions = {
   definition: {
