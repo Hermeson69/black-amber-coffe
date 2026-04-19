@@ -16,16 +16,29 @@ export default class JWTservice {
 
   constructor() {
     this.secret = JWTSECRETKEY ?? "seu_secret_padrao";
-    this.expriration = JWTEXPIRATION ?? "7d";
+    this.expriration = this.normalizeExpiration(JWTEXPIRATION);
     this.refresh = JWTREFRESHSECRET ?? "seu_refresh_aqui";
+  }
+
+  private normalizeExpiration(value: string | undefined): string {
+    if (!value) {
+      return "30d";
+    }
+
+    const cleaned = value
+      .split("///")[0]
+      .trim()
+      .replace(/^['\"]|['\"]$/g, "");
+
+    return cleaned || "30d";
   }
 
   /**
    * Gerar o token JWT
-   * @param payload 
+   * @param payload
    * @returns retorna que o uruario estara logado até que sua section de 7d acabe
    */
-  
+
   generateToken(payload: JWTPayload): string {
     return jwt.sign(payload, this.secret, {
       expiresIn: this.expriration as any,
@@ -34,15 +47,15 @@ export default class JWTservice {
 
   /**
    * Verificar o token do usuario ao fazer login
-   * @param token 
+   * @param token
    * @returns o decoded para ver se é valido
    */
 
-  verifyToken (token: string): JWTPayload | null{
-    try{
+  verifyToken(token: string): JWTPayload | null {
+    try {
       const decoded = jwt.verify(token, this.secret) as JWTPayload;
-      return decoded
-    }catch(error){
+      return decoded;
+    } catch (error) {
       return null;
     }
   }
@@ -53,21 +66,20 @@ export default class JWTservice {
    * @returns token do usuario passado via json (web né vida)
    */
 
-  extractTokenFromHeader (authHeader: string | undefined): string | null {
-    if(!authHeader){
-      throw new Error ("Sem token presente no cabeçalho")
+  extractTokenFromHeader(authHeader: string | undefined): string | null {
+    if (!authHeader) {
+      throw new Error("Sem token presente no cabeçalho");
     }
 
     const parts = authHeader.split(" ");
-    if(parts.length !== 2 || parts[0] !== "Bearer"){
+    if (parts.length !== 2 || parts[0] !== "Bearer") {
       return null;
     }
 
     return parts[1];
   }
 
-  generateRefreshToken(userId: string):string{
-    return jwt.sign({id: userId}, this.refresh!, {expiresIn: "1h"})
+  generateRefreshToken(userId: string): string {
+    return jwt.sign({ id: userId }, this.refresh!, { expiresIn: "30d" });
   }
-
 }
