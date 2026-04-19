@@ -29,6 +29,13 @@
       "when": 1776616254976,
       "tag": "0003_narrow_colossus",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776628585882,
+      "tag": "0004_hesitant_yellowjacket",
+      "breakpoints": true
     }
   ]
 }
