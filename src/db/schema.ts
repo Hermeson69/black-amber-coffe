@@ -6,7 +6,6 @@ export const Clients = pgTable("clients", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   password: text("password").notNull(),
-  phone: text("phone"),
   createdAt: text().notNull(),
   updatedAt: text().notNull(),
 });
@@ -15,6 +14,7 @@ export const Profiles = pgTable("profiles", {
   id: serial("id").primaryKey(),
   clientId: integer("client_id").notNull(),
   fullName: text("full_name").notNull(),
+  phone: text("phone"),
   avatarImage: text("avatar_image"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),

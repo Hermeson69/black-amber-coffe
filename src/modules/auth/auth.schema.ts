@@ -12,9 +12,9 @@ export const LoginClientSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
-
 export const ProfileResponseSchema = z.object({
   fullName: z.string(),
+  phone: z.string().nullable(),
   avatarImage: z.string().nullable(),
   createdAt: z.string(),
 });
@@ -41,7 +41,6 @@ export const LoginResponseSchema = z.object({
     }),
   }),
 });
-
 
 export type RegisterInput = z.infer<typeof RegisterClientSchema>;
 export type ProfileResponse = z.infer<typeof ProfileResponseSchema>;

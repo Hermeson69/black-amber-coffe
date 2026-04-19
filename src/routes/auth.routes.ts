@@ -64,6 +64,9 @@ const clientController = new authController(clientService);
  *                       properties:
  *                         fullName:
  *                           type: string
+ *                         phone:
+ *                           type: string
+ *                           nullable: true
  *                         avatarImage:
  *                           type: string
  *                           nullable: true
@@ -126,6 +129,9 @@ authRoutes.post(
  *                           properties:
  *                             fullName:
  *                               type: string
+ *                             phone:
+ *                               type: string
+ *                               nullable: true
  *                             avatarImage:
  *                               type: string
  *                               nullable: true

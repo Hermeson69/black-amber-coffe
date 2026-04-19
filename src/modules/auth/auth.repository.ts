@@ -1,8 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { Clients } from "../../db/schema";
+import { Clients, Profiles } from "../../db/schema";
 import authModel from "./auth.model";
-import { LoginInput } from "./auth.schema";
 
 export default class authRepository {
   db: ReturnType<typeof drizzle>;
@@ -12,34 +11,47 @@ export default class authRepository {
   }
 
   async create(data: authModel): Promise<authModel> {
-    const clientData: typeof Clients.$inferInsert = {
-      publicId: data.publicId,
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      phone: data.phone,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    };
+    // Use transaction to ensure atomicity: either both client and profile are created, or neither
+    const result = await this.db.transaction(async (tx) => {
+      const clientData: typeof Clients.$inferInsert = {
+        publicId: data.publicId,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      };
 
-    const [inserted] = await this.db
-      .insert(Clients)
-      .values(clientData)
-      .returning();
+      const [inserted] = await tx
+        .insert(Clients)
+        .values(clientData)
+        .returning();
 
-    return new authModel(
-      inserted.id,
-      inserted.publicId,
-      inserted.name,
-      inserted.email,
-      inserted.password,
-      inserted.phone ?? undefined,
-      inserted.createdAt,
-      inserted.updatedAt,
-    );
+      const profileData: typeof Profiles.$inferInsert = {
+        clientId: inserted.id,
+        fullName: inserted.name,
+        phone: data.phone,
+        avatarImage: null,
+        createdAt: inserted.createdAt,
+        updatedAt: inserted.updatedAt,
+      };
+
+      await tx.insert(Profiles).values(profileData);
+
+      return new authModel(
+        inserted.id,
+        inserted.publicId,
+        inserted.name,
+        inserted.email,
+        inserted.password,
+        data.phone,
+        inserted.createdAt,
+        inserted.updatedAt,
+      );
+    });
+
+    return result;
   }
-
-  
 
   async getByEmail(email: string): Promise<authModel | null> {
     const [client] = await this.db
@@ -58,7 +70,36 @@ export default class authRepository {
       client.name,
       client.email,
       client.password,
-      client.phone ?? undefined,
+      undefined,
+      client.createdAt,
+      client.updatedAt,
+    );
+  }
+
+  async getById(id: string): Promise<authModel | null> {
+    const [row] = await this.db
+      .select({
+        client: Clients,
+        profile: Profiles,
+      })
+      .from(Clients)
+      .leftJoin(Profiles, eq(Profiles.clientId, Clients.id))
+      .where(eq(Clients.publicId, id))
+      .limit(1);
+
+    if (!row) {
+      return null;
+    }
+
+    const { client, profile } = row;
+
+    return new authModel(
+      client.id,
+      client.publicId,
+      client.name,
+      client.email,
+      client.password,
+      profile?.phone ?? undefined,
       client.createdAt,
       client.updatedAt,
     );
