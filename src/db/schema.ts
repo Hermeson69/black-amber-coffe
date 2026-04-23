@@ -6,8 +6,8 @@ export const Clients = pgTable("clients", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   password: text("password").notNull(),
-  createdAt: text().notNull(),
-  updatedAt: text().notNull(),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });
 
 export const Profiles = pgTable("profiles", {

@@ -36,6 +36,13 @@
       "when": 1776628585882,
       "tag": "0004_hesitant_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1776957768316,
+      "tag": "0005_boring_juggernaut",
+      "breakpoints": true
     }
   ]
 }
