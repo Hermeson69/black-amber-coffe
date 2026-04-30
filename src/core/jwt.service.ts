@@ -6,6 +6,7 @@ import { JWTEXPIRATION, JWTREFRESHSECRET, JWTSECRETKEY } from "../config/env";
 interface JWTPayload {
   id: number;
   email: string;
+  publicId?: string;
   role?: string;
 }
 
@@ -68,7 +69,7 @@ export default class JWTservice {
 
   extractTokenFromHeader(authHeader: string | undefined): string | null {
     if (!authHeader) {
-      throw new Error("Sem token presente no cabeçalho");
+      return null;
     }
 
     const parts = authHeader.split(" ");

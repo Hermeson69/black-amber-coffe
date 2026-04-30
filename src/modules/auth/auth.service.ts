@@ -110,6 +110,7 @@ export default class authService {
     const accessToken = this.jwtService.generateToken({
       id: client.id,
       email: client.email,
+      publicId: client.publicId,
     });
 
     const refreshToken = this.jwtService.generateRefreshToken(client.publicId);
