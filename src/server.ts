@@ -2,9 +2,9 @@ import "dotenv/config";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
 import express from "express";
-import { healthRoutes } from "./routes/health.routes";
-import { authRoutes } from "./routes/auth.routes";
-import { userRoutes } from "./routes/user.routes";
+import { healthRoutes } from "@/routes/health.routes";
+import { authRoutes } from "@/routes/auth.routes";
+import { userRoutes } from "@/routes/user.routes";
 const app = express();
 const PORT = process.env.PORT || 3000;
 

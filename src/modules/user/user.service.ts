@@ -1,7 +1,7 @@
-import SecurityUtils from "../../core/security";
-import authRepository from "../auth/auth.repository";
-import userRepository from "./user.repository";
-import authModel from "../auth/auth.model";
+import SecurityUtils from "@/core/security";
+import authRepository from "@/modules/auth/auth.repository";
+import userRepository from "@/modules/user/user.repository";
+import authModel from "@/modules/auth/auth.model";
 import {
   UserUpdateInput,
   UserResponse,

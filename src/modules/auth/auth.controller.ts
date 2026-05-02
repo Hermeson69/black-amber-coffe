@@ -1,7 +1,13 @@
-import authService from "./auth.service";
+import authService from "@/modules/auth/auth.service";
 
-import { LoginInput, LoginResponse, RegisterInput, RegisterResponse } from "./auth.schema";
+import {
+  LoginInput,
+  LoginResponse,
+  RegisterInput,
+  RegisterResponse,
+} from "@/modules/auth/auth.schema";
 import { Request, Response } from "express";
+import handlers from "@/shared/handlers/handles";
 
 export default class authController {
   private authService: authService;
@@ -17,18 +23,17 @@ export default class authController {
         await this.authService.create(data);
       res.status(201).json(clientResponse);
     } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      handlers.error(res, error);
     }
-  };
+  }
 
-  async login(req: Request, res: Response): Promise<void>{
-    try{
+  async login(req: Request, res: Response): Promise<void> {
+    try {
       const data: LoginInput = req.body;
-      const loginResponse: LoginResponse =
-        await this.authService.login(data);
+      const loginResponse: LoginResponse = await this.authService.login(data);
       res.status(201).json(loginResponse);
-    }catch (error){
-      res.status(400).json({error: (error as Error).message})
+    } catch (error) {
+      handlers.error(res, error);
     }
   }
 }

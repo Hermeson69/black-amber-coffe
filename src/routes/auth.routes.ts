@@ -1,10 +1,10 @@
 import { Router } from "express";
 
-import authController from "../modules/auth/auth.controller";
-import authService from "../modules/auth/auth.service";
-import authRepository from "../modules/auth/auth.repository";
-import JWTservice from "../core/jwt.service";
-import { db } from "../config/database";
+import authController from "@/modules/auth/auth.controller";
+import authService from "@/modules/auth/auth.service";
+import authRepository from "@/modules/auth/auth.repository";
+import JWTservice from "@/core/jwt.service";
+import { db } from "@/config/database";
 
 const authRoutes = Router();
 

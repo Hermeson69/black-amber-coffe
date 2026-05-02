@@ -1,6 +1,10 @@
-import userService from "./user.service";
-import { GetUserResponseSchema, UpdateUserResponseSchema } from "./user.schema";
+import userService from "@/modules/user/user.service";
+import {
+  GetUserResponseSchema,
+  UpdateUserResponseSchema,
+} from "@/modules/user/user.schema";
 import { Request, Response } from "express";
+import handlers from "@/shared/handlers/handles";
 
 export default class userController {
   private userService: userService;
@@ -28,11 +32,7 @@ export default class userController {
 
       res.status(200).json(response);
     } catch (error) {
-      if (error instanceof Error && error.message === "User not found") {
-        res.status(404).json({ error: "User not found" });
-      } else {
-        res.status(500).json({ error: "Internal server error" });
-      }
+      handlers.error(res, error);
     }
   }
 
@@ -58,19 +58,7 @@ export default class userController {
 
       res.status(200).json(response);
     } catch (error) {
-      if (error instanceof Error) {
-        if (error.message === "User not found") {
-          res.status(404).json({ error: "User not found" });
-        } else if (
-          error.message.includes("at least one field must be provided")
-        ) {
-          res.status(400).json({ error: error.message });
-        } else {
-          res.status(400).json({ error: error.message });
-        }
-      } else {
-        res.status(500).json({ error: "Internal server error" });
-      }
+      handlers.error(res, error);
     }
   }
 
@@ -89,11 +77,7 @@ export default class userController {
 
       res.status(204).send();
     } catch (error) {
-      if (error instanceof Error && error.message === "User not found") {
-        res.status(404).json({ error: "User not found" });
-      } else {
-        res.status(500).json({ error: "Internal server error" });
-      }
+      handlers.error(res, error);
     }
   }
 }

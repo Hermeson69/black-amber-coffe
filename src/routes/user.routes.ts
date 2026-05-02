@@ -1,10 +1,10 @@
 import { Router } from "express";
-import userController from "../modules/user/user.controller";
-import userService from "../modules/user/user.service";
-import userRepository from "../modules/user/user.repository";
-import authRepository from "../modules/auth/auth.repository";
-import { AuthMiddleware } from "../modules/auth/auth.middleware";
-import { db } from "../config/database";
+import userController from "@/modules/user/user.controller";
+import userService from "@/modules/user/user.service";
+import userRepository from "@/modules/user/user.repository";
+import authRepository from "@/modules/auth/auth.repository";
+import { AuthMiddleware } from "@/modules/auth/auth.middleware";
+import { db } from "@/config/database";
 
 const userRoutes = Router();
 

@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { Clients, Profiles } from "../../db/schema";
-import authModel from "./auth.model";
+import { Clients, Profiles } from "@/db/schema";
+import authModel from "@/modules/auth/auth.model";
 
 export default class authRepository {
   db: ReturnType<typeof drizzle>;
