@@ -10,6 +10,35 @@ export default class userRepository {
     this.db = db;
   }
 
+  /**
+   * Get user by publicId with profile data in single query
+   */
+  async getByPublicId(publicId: string): Promise<authModel | null> {
+    const result = await this.db
+      .select()
+      .from(Clients)
+      .leftJoin(Profiles, eq(Clients.id, Profiles.clientId))
+      .where(eq(Clients.publicId, publicId))
+      .limit(1);
+
+    if (!result.length) {
+      return null;
+    }
+
+    const { clients, profiles } = result[0];
+
+    return new authModel(
+      clients.id,
+      clients.publicId,
+      profiles?.fullName ?? "",
+      clients.email,
+      clients.password,
+      profiles?.phone ?? undefined,
+      clients.createdAt,
+      clients.updatedAt,
+    );
+  }
+
   async update(data: authModel): Promise<authModel> {
     // Use transaction to ensure atomicity: both tables updated or neither
     const result = await this.db.transaction(async (tx) => {

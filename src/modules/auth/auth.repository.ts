@@ -53,74 +53,56 @@ export default class authRepository {
   }
 
   async getByEmail(email: string): Promise<authModel | null> {
-    const [client] = await this.db
+    // Single query with leftJoin to avoid N+1 problem
+    const result = await this.db
       .select()
       .from(Clients)
+      .leftJoin(Profiles, eq(Clients.id, Profiles.clientId))
       .where(eq(Clients.email, email))
       .limit(1);
 
-    if (!client) {
+    if (!result.length) {
       return null;
     }
 
-    // Try to fetch profile if the table exists (avoid failing when profiles table is missing)
-    let profile: any = null;
-    try {
-      const [p] = await this.db
-        .select()
-        .from(Profiles)
-        .where(eq(Profiles.clientId, client.id))
-        .limit(1);
-      profile = p ?? null;
-    } catch (e) {
-      // If profile table doesn't exist or query fails, ignore and fall back to client-only data
-      profile = null;
-    }
+    const { clients, profiles } = result[0];
 
     return new authModel(
-      client.id,
-      client.publicId,
-      profile?.fullName ?? "",
-      client.email,
-      client.password,
-      profile?.phone ?? undefined,
-      client.createdAt,
-      client.updatedAt,
+      clients.id,
+      clients.publicId,
+      profiles?.fullName ?? "",
+      clients.email,
+      clients.password,
+      profiles?.phone ?? undefined,
+      clients.createdAt,
+      clients.updatedAt,
     );
   }
 
   async getById(id: string): Promise<authModel | null> {
-    const [client] = await this.db
+    // Single query with leftJoin to avoid N+1 problem
+    const result = await this.db
       .select()
       .from(Clients)
+      .leftJoin(Profiles, eq(Clients.id, Profiles.clientId))
       .where(eq(Clients.publicId, id))
       .limit(1);
 
-    if (!client) {
+    if (!result.length) {
       return null;
     }
 
-    let profile: any = null;
-    try {
-      const [p] = await this.db
-        .select()
-        .from(Profiles)
-        .where(eq(Profiles.clientId, client.id))
-        .limit(1);
-      profile = p ?? null;
-    } catch (e) {
-      profile = null;
-    }
+    const { clients, profiles } = result[0];
 
     return new authModel(
-      client.id,
-      client.publicId,
-      profile?.fullName ?? "",
-      client.email,
-      client.password,
-      profile?.phone ?? undefined,
-      client.createdAt,
-      client.updatedAt,
+      clients.id,
+      clients.publicId,
+      profiles?.fullName ?? "",
+      clients.email,
+      clients.password,
+      profiles?.phone ?? undefined,
+      clients.createdAt,
+      clients.updatedAt,
     );
   }
 }
