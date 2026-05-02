@@ -25,7 +25,6 @@ export const RegisterResponseSchema = z.object({
     email: z.email(),
     createdAt: z.string(),
     updatedAt: z.string(),
-    name: z.string(),
     profile: ProfileResponseSchema,
   }),
 });

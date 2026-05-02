@@ -69,7 +69,6 @@ export default class authService {
         email: createdClient.email,
         createdAt: createdClient.createdAt,
         updatedAt: createdClient.updatedAt,
-        name: createdClient.name,
         profile: {
           fullName: createdClient.name,
           phone: createdClient.phone ?? null,
