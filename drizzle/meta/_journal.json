@@ -64,6 +64,13 @@
       "when": 1777756443501,
       "tag": "0008_omniscient_namor",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1777756955391,
+      "tag": "0009_clammy_wolverine",
+      "breakpoints": true
     }
   ]
 }
