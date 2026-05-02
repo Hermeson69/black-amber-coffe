@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ALTER COLUMN "worker_id" DROP NOT NULL;
