@@ -16,7 +16,6 @@ export default class userRepository {
       const [updatedClient] = await tx
         .update(Clients)
         .set({
-          name: data.name,
           email: data.email,
           password: data.password,
           updatedAt: data.updatedAt,
@@ -40,7 +39,7 @@ export default class userRepository {
       return new authModel(
         updatedClient.id,
         updatedClient.publicId,
-        updatedClient.name,
+        data.name,
         updatedClient.email,
         updatedClient.password,
         data.phone,

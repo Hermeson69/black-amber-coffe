@@ -15,7 +15,6 @@ export default class authRepository {
     const result = await this.db.transaction(async (tx) => {
       const clientData: typeof Clients.$inferInsert = {
         publicId: data.publicId,
-        name: data.name,
         email: data.email,
         password: data.password,
         createdAt: data.createdAt,
@@ -29,8 +28,8 @@ export default class authRepository {
 
       const profileData: typeof Profiles.$inferInsert = {
         clientId: inserted.id,
-        fullName: inserted.name,
-        phone: data.phone,
+        fullName: data.name,
+        phone: data.phone ?? null,
         avatarImage: null,
         createdAt: inserted.createdAt,
         updatedAt: inserted.updatedAt,
@@ -41,7 +40,7 @@ export default class authRepository {
       return new authModel(
         inserted.id,
         inserted.publicId,
-        inserted.name,
+        data.name,
         inserted.email,
         inserted.password,
         data.phone,
@@ -64,39 +63,59 @@ export default class authRepository {
       return null;
     }
 
+    // Try to fetch profile if the table exists (avoid failing when profiles table is missing)
+    let profile: any = null;
+    try {
+      const [p] = await this.db
+        .select()
+        .from(Profiles)
+        .where(eq(Profiles.clientId, client.id))
+        .limit(1);
+      profile = p ?? null;
+    } catch (e) {
+      // If profile table doesn't exist or query fails, ignore and fall back to client-only data
+      profile = null;
+    }
+
     return new authModel(
       client.id,
       client.publicId,
-      client.name,
+      profile?.fullName ?? "",
       client.email,
       client.password,
-      undefined,
+      profile?.phone ?? undefined,
       client.createdAt,
       client.updatedAt,
     );
   }
 
   async getById(id: string): Promise<authModel | null> {
-    const [row] = await this.db
-      .select({
-        client: Clients,
-        profile: Profiles,
-      })
+    const [client] = await this.db
+      .select()
       .from(Clients)
-      .leftJoin(Profiles, eq(Profiles.clientId, Clients.id))
       .where(eq(Clients.publicId, id))
       .limit(1);
 
-    if (!row) {
+    if (!client) {
       return null;
     }
 
-    const { client, profile } = row;
+    let profile: any = null;
+    try {
+      const [p] = await this.db
+        .select()
+        .from(Profiles)
+        .where(eq(Profiles.clientId, client.id))
+        .limit(1);
+      profile = p ?? null;
+    } catch (e) {
+      profile = null;
+    }
 
     return new authModel(
       client.id,
       client.publicId,
-      client.name,
+      profile?.fullName ?? "",
       client.email,
       client.password,
       profile?.phone ?? undefined,

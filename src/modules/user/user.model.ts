@@ -38,9 +38,9 @@ export default class userModel {
     return new userModel(
       client.id,
       client.publicId,
-      client.name,
+      profile?.fullName ?? "",
       client.email,
-      profile?.fullName ?? client.name,
+      profile?.fullName ?? "",
       profile?.phone ?? null,
       profile?.avatarImage ?? null,
       client.createdAt,
