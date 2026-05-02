@@ -5,8 +5,14 @@
     "moduleResolution": "Node16",
     "esModuleInterop": true,
     "strict": true,
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
     "rootDir": ".",
     "outDir": "dist",
+
+    "paths": {
+      "@/*": ["./src/*"],
+    },
     "types": ["node"],
     "skipLibCheck": true
   },
