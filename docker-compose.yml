@@ -1,0 +1,10 @@
+services:
+  black-amber-coffee-api:
+    container_name: black-amber-coffee-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development

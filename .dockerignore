@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Dependencies (serão reinstaladas com npm ci)
+node_modules
+npm-debug.log
+package-lock.json
+
+# Build
+dist
+build
+
+# Development
+.env
+.env.local
+.env.*.local
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Tests
+coverage
+.nyc_output
+
+# Documentation
+README.md
+doc/
+LICENSE
+
+# Docker
+dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE
+.prettier*
+.eslint*
+tsconfig.json
