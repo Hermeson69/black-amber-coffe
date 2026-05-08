@@ -46,8 +46,8 @@ src/
 - `npm run build` - compila o TypeScript
 - `npm run migrate-new` - gera nova migration do Drizzle
 - `npm run migrate-up` - aplica migrations
-- `npm run db:delete` - remove o banco SQLite local
-- `npm run db:reset` - recria o banco SQLite local e aplica as migrations
+- `npm run db:delete` - legado de SQLite (nao usado com PostgreSQL)
+- `npm run db:reset` - legado de SQLite (nao usado com PostgreSQL)
 
 ## Banco de Dados
 

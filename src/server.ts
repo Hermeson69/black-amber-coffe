@@ -5,6 +5,7 @@ import express from "express";
 import { healthRoutes } from "@/routes/health.routes";
 import { authRoutes } from "@/routes/auth.routes";
 import { userRoutes } from "@/routes/user.routes";
+import { seed } from "@/seed/seed";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -61,4 +62,12 @@ app.use("/api", userRoutes);
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on PORT ${PORT}`);
   console.log(`📚 Docs available at http://localhost:${PORT}/docs`);
+
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      await seed();
+    } catch (error) {
+      console.error("❌ Erro ao executar seed:", error);
+    }
+  }
 });

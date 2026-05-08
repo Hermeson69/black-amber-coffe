@@ -71,6 +71,34 @@
       "when": 1777756955391,
       "tag": "0009_clammy_wolverine",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1777759999999,
+      "tag": "0010_add_workers_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1778279183484,
+      "tag": "0011_absent_the_call",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1778279391018,
+      "tag": "0012_familiar_molly_hayes",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1778279708229,
+      "tag": "0013_bouncy_owl",
+      "breakpoints": true
     }
   ]
 }
