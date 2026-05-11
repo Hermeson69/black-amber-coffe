@@ -1,1 +1,0 @@
-ALTER TABLE "workers" ALTER COLUMN "last_login" SET NOT NULL;

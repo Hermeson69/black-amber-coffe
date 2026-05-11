@@ -1,5 +1,8 @@
 import * as z from "zod";
 import { WorkerRoles } from "../../core/enuns/workerRole";
+///admin querys to be cadastrate aq worker and login worker and get worker by id and update worker
+/// at allm worker have a profile with fullName, phone, avatarImage, email, createdAt and updatedAt whe be update at separate shema only for update profile with fullName, phone and avatarImage.
+
 
 // Worker Profile Response
 export const workerProfileSchema = z.object({

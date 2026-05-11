@@ -1,14 +1,16 @@
 export class OrderStatus {
 
   static readonly PENDING = "PENDING";
-  static readonly IN_PROGRESS = "IN_PROGRESS";
+  static readonly IN_PROGRESS = "IN PROGRESS";
   static readonly COMPLETED = "COMPLETED";
+  static readonly  LATE = "LATE";
   static readonly CANCELLED = "CANCELLED";
 
   static readonly VALUES = [
     OrderStatus.PENDING,
     OrderStatus.IN_PROGRESS,
     OrderStatus.COMPLETED,
+    OrderStatus.LATE,
     OrderStatus.CANCELLED
   ] as const
 
