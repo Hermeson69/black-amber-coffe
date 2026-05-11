@@ -1,5 +1,5 @@
 import { db } from "../config/database";
-import { Clients, Profiles, Workers, WorkerProfiles } from "../db/schema";
+import { clients, profiles, workers, workerProfiles } from "../db/schema";
 import SecurityUtils from "../core/security";
 import { generateId } from "../core/gereteId";
 import { eq } from "drizzle-orm";
@@ -38,10 +38,10 @@ export async function seed() {
     // Make seed idempotent per-record: create workers that are missing and ensure test client exists
     const existingWorkerProfile = await db
       .select()
-      .from(WorkerProfiles)
+      .from(workerProfiles)
       .limit(1);
 
-    const now = new Date().toISOString();
+    const now = new Date();
     const hashedPassword = await SecurityUtils.hashPassword("123456");
 
     // Create missing workers and their profiles
@@ -49,8 +49,8 @@ export async function seed() {
       await db.transaction(async (tx) => {
         console.log("👷 Criando workers...");
 
-        const workers = await tx
-          .insert(Workers)
+        const insertedWorkers = await tx
+          .insert(workers)
           .values(
             workerSeedData.map((worker) => ({
               publicId: generateId(),
@@ -63,8 +63,8 @@ export async function seed() {
           )
           .returning();
 
-        await tx.insert(WorkerProfiles).values(
-          workers.map((worker, index) => ({
+        await tx.insert(workerProfiles).values(
+          insertedWorkers.map((worker, index) => ({
             workerId: worker.id,
             email: workerSeedData[index].email,
             password: hashedPassword,
@@ -82,14 +82,14 @@ export async function seed() {
       for (const seed of workerSeedData) {
         const found = await db
           .select()
-          .from(WorkerProfiles)
-          .where(eq(WorkerProfiles.email, seed.email))
+          .from(workerProfiles)
+          .where(eq(workerProfiles.email, seed.email))
           .limit(1);
 
         if (!found.length) {
           await db.transaction(async (tx) => {
             const [worker] = await tx
-              .insert(Workers)
+              .insert(workers)
               .values({
                 publicId: generateId(),
                 role: seed.role,
@@ -100,7 +100,7 @@ export async function seed() {
               })
               .returning();
 
-            await tx.insert(WorkerProfiles).values({
+            await tx.insert(workerProfiles).values({
               workerId: worker.id,
               email: seed.email,
               password: hashedPassword,
@@ -119,15 +119,15 @@ export async function seed() {
     // Ensure test client exists (insert if missing)
     const existingClient = await db
       .select()
-      .from(Clients)
-      .where(eq(Clients.email, "cliente@teste.com"))
+      .from(clients)
+      .where(eq(clients.email, "cliente@teste.com"))
       .limit(1);
 
     if (!existingClient.length) {
       console.log("👤 Criando cliente de teste...");
       await db.transaction(async (tx) => {
         const [client] = await tx
-          .insert(Clients)
+          .insert(clients)
           .values({
             publicId: generateId(),
             email: "cliente@teste.com",
@@ -137,7 +137,7 @@ export async function seed() {
           })
           .returning();
 
-        await tx.insert(Profiles).values({
+        await tx.insert(profiles).values({
           clientId: client.id,
           fullName: "Cliente Teste",
           phone: "11955555555",

@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { Clients, Profiles } from "@/db/schema";
+import { clients, profiles } from "@/db/schema";
 import authModel from "@/modules/auth/auth.model";
 
 export default class userRepository {
@@ -16,26 +16,26 @@ export default class userRepository {
   async getByPublicId(publicId: string): Promise<authModel | null> {
     const result = await this.db
       .select()
-      .from(Clients)
-      .leftJoin(Profiles, eq(Clients.id, Profiles.clientId))
-      .where(eq(Clients.publicId, publicId))
+      .from(clients)
+      .leftJoin(profiles, eq(clients.id, profiles.clientId))
+      .where(eq(clients.publicId, publicId))
       .limit(1);
 
     if (!result.length) {
       return null;
     }
 
-    const { clients, profiles } = result[0];
+    const { clients: clientRow, profiles: profileRow } = result[0];
 
     return new authModel(
-      clients.id,
-      clients.publicId,
-      profiles?.fullName ?? "",
-      clients.email,
-      clients.password,
-      profiles?.phone ?? undefined,
-      clients.createdAt,
-      clients.updatedAt,
+      clientRow.id,
+      clientRow.publicId,
+      profileRow?.fullName ?? "",
+      clientRow.email,
+      clientRow.password,
+      profileRow?.phone ?? undefined,
+      clientRow.createdAt,
+      clientRow.updatedAt,
     );
   }
 
@@ -43,13 +43,13 @@ export default class userRepository {
     // Use transaction to ensure atomicity: both tables updated or neither
     const result = await this.db.transaction(async (tx) => {
       const [updatedClient] = await tx
-        .update(Clients)
+        .update(clients)
         .set({
           email: data.email,
           password: data.password,
-          updatedAt: data.updatedAt,
+          updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
         })
-        .where(eq(Clients.publicId, data.publicId))
+        .where(eq(clients.publicId, data.publicId))
         .returning();
 
       if (!updatedClient) {
@@ -57,13 +57,13 @@ export default class userRepository {
       }
 
       await tx
-        .update(Profiles)
+        .update(profiles)
         .set({
           fullName: data.name,
           phone: data.phone,
-          updatedAt: data.updatedAt,
+          updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
         })
-        .where(eq(Profiles.clientId, updatedClient.id));
+        .where(eq(profiles.clientId, updatedClient.id));
 
       return new authModel(
         updatedClient.id,
@@ -85,8 +85,8 @@ export default class userRepository {
     await this.db.transaction(async (tx) => {
       const [client] = await tx
         .select()
-        .from(Clients)
-        .where(eq(Clients.publicId, id))
+        .from(clients)
+        .where(eq(clients.publicId, id))
         .limit(1);
 
       if (!client) {
@@ -94,10 +94,10 @@ export default class userRepository {
       }
 
       // Delete profile first (foreign key constraint)
-      await tx.delete(Profiles).where(eq(Profiles.clientId, client.id));
+      await tx.delete(profiles).where(eq(profiles.clientId, client.id));
 
       // Then delete client
-      await tx.delete(Clients).where(eq(Clients.id, client.id));
+      await tx.delete(clients).where(eq(clients.id, client.id));
     });
   }
 }

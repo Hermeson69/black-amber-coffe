@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
-import { Clients, Profiles } from "@/db/schema";
+import { clients, profiles } from "@/db/schema";
 import authModel from "@/modules/auth/auth.model";
 
 export default class authRepository {
@@ -13,20 +13,20 @@ export default class authRepository {
   async create(data: authModel): Promise<authModel> {
     // Use transaction to ensure atomicity: either both client and profile are created, or neither
     const result = await this.db.transaction(async (tx) => {
-      const clientData: typeof Clients.$inferInsert = {
+      const clientData: typeof clients.$inferInsert = {
         publicId: data.publicId,
         email: data.email,
         password: data.password,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
+        createdAt: data.createdAt ? new Date(data.createdAt) : undefined,
+        updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
       };
 
       const [inserted] = await tx
-        .insert(Clients)
+        .insert(clients)
         .values(clientData)
         .returning();
 
-      const profileData: typeof Profiles.$inferInsert = {
+      const profileData: typeof profiles.$inferInsert = {
         clientId: inserted.id,
         fullName: data.name,
         phone: data.phone ?? null,
@@ -35,7 +35,7 @@ export default class authRepository {
         updatedAt: inserted.updatedAt,
       };
 
-      await tx.insert(Profiles).values(profileData);
+      await tx.insert(profiles).values(profileData);
 
       return new authModel(
         inserted.id,
@@ -56,26 +56,26 @@ export default class authRepository {
     // Single query with leftJoin to avoid N+1 problem
     const result = await this.db
       .select()
-      .from(Clients)
-      .leftJoin(Profiles, eq(Clients.id, Profiles.clientId))
-      .where(eq(Clients.email, email))
+      .from(clients)
+      .leftJoin(profiles, eq(clients.id, profiles.clientId))
+      .where(eq(clients.email, email))
       .limit(1);
 
     if (!result.length) {
       return null;
     }
 
-    const { clients, profiles } = result[0];
+    const { clients: client, profiles: profile } = result[0];
 
     return new authModel(
-      clients.id,
-      clients.publicId,
-      profiles?.fullName ?? "",
-      clients.email,
-      clients.password,
-      profiles?.phone ?? undefined,
-      clients.createdAt,
-      clients.updatedAt,
+      client.id,
+      client.publicId,
+      profile?.fullName ?? "",
+      client.email,
+      client.password,
+      profile?.phone ?? undefined,
+      client.createdAt,
+      client.updatedAt,
     );
   }
 
@@ -83,26 +83,26 @@ export default class authRepository {
     // Single query with leftJoin to avoid N+1 problem
     const result = await this.db
       .select()
-      .from(Clients)
-      .leftJoin(Profiles, eq(Clients.id, Profiles.clientId))
-      .where(eq(Clients.publicId, id))
+      .from(clients)
+      .leftJoin(profiles, eq(clients.id, profiles.clientId))
+      .where(eq(clients.publicId, id))
       .limit(1);
 
     if (!result.length) {
       return null;
     }
 
-    const { clients, profiles } = result[0];
+    const { clients: client, profiles: profile } = result[0];
 
     return new authModel(
-      clients.id,
-      clients.publicId,
-      profiles?.fullName ?? "",
-      clients.email,
-      clients.password,
-      profiles?.phone ?? undefined,
-      clients.createdAt,
-      clients.updatedAt,
+      client.id,
+      client.publicId,
+      profile?.fullName ?? "",
+      client.email,
+      client.password,
+      profile?.phone ?? undefined,
+      client.createdAt,
+      client.updatedAt,
     );
   }
 }

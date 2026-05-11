@@ -10,23 +10,21 @@ import {
   boolean,
   pgEnum,
   timestamp,
-  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-// ─── Enums ───────────────────────────────────────────────────────────────────
+//  Enums 
 
 export const workerRolesEnum = pgEnum("worker_roles", WorkerRoles.values());
 export const orderStatusEnum = pgEnum("order_status", OrderStatus.values());
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+//  Helpers 
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 };
 
-// ─── Tables ──────────────────────────────────────────────────────────────────
-
+//  Tables 
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
   publicId: text("public_id").notNull().unique(),
@@ -104,8 +102,7 @@ export const payments = pgTable("payments", {
   ...timestamps,
 });
 
-// ─── Relations ───────────────────────────────────────────────────────────────
-
+//  Relations 
 export const clientsRelations = relations(clients, ({ one, many }) => ({
   profile: one(profiles, { fields: [clients.id], references: [profiles.clientId] }),
   orders: many(orders),
