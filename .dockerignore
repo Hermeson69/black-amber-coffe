@@ -3,10 +3,9 @@
 .gitignore
 .gitattributes
 
-# Dependencies (serão reinstaladas com npm ci)
+# Dependencies
 node_modules
 npm-debug.log
-package-lock.json
 
 # Build
 dist
@@ -37,11 +36,5 @@ doc/
 LICENSE
 
 # Docker
-dockerfile
 docker-compose.yml
 .dockerignore
-
-# IDE
-.prettier*
-.eslint*
-tsconfig.json
