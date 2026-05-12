@@ -1,7 +1,14 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq } from "drizzle-orm";
-import { clients, profiles } from "@/db/schema";
+import { eq, or } from "drizzle-orm";
+import { clients, profiles, workers, workerProfiles } from "@/db/schema";
 import authModel from "@/modules/auth/auth.model";
+
+export type UserType = "user" | "worker";
+
+export interface AuthEntity {
+  type: UserType;
+  user: authModel;
+}
 
 export default class authRepository {
   db: ReturnType<typeof drizzle>;
@@ -11,7 +18,6 @@ export default class authRepository {
   }
 
   async create(data: authModel): Promise<authModel> {
-    // Use transaction to ensure atomicity: either both client and profile are created, or neither
     const result = await this.db.transaction(async (tx) => {
       const clientData: typeof clients.$inferInsert = {
         publicId: data.publicId,
@@ -52,57 +58,107 @@ export default class authRepository {
     return result;
   }
 
-  async getByEmail(email: string): Promise<authModel | null> {
-    // Single query with leftJoin to avoid N+1 problem
-    const result = await this.db
+  async getByEmail(email: string): Promise<AuthEntity | null> {
+    const clientResult = await this.db
       .select()
       .from(clients)
       .leftJoin(profiles, eq(clients.id, profiles.clientId))
       .where(eq(clients.email, email))
       .limit(1);
 
-    if (!result.length) {
-      return null;
+    if (clientResult.length) {
+      const { clients: client, profiles: profile } = clientResult[0];
+      return {
+        type: "user",
+        user: new authModel(
+          client.id,
+          client.publicId,
+          profile?.fullName ?? "",
+          client.email,
+          client.password,
+          profile?.phone ?? undefined,
+          client.createdAt,
+          client.updatedAt,
+        ),
+      };
     }
 
-    const { clients: client, profiles: profile } = result[0];
+    const workerResult = await this.db
+      .select()
+      .from(workers)
+      .leftJoin(workerProfiles, eq(workers.id, workerProfiles.workerId))
+      .where(eq(workerProfiles.email, email))
+      .limit(1);
 
-    return new authModel(
-      client.id,
-      client.publicId,
-      profile?.fullName ?? "",
-      client.email,
-      client.password,
-      profile?.phone ?? undefined,
-      client.createdAt,
-      client.updatedAt,
-    );
+    if (workerResult.length) {
+      const { workers: worker, worker_profiles: profile } = workerResult[0];
+      return {
+        type: "worker",
+        user: new authModel(
+          worker.id,
+          worker.publicId,
+          profile?.fullName ?? "",
+          profile?.email ?? "",
+          profile?.password ?? "",
+          profile?.phone ?? undefined,
+          worker.createdAt,
+          worker.updatedAt,
+        ),
+      };
+    }
+
+    return null;
   }
 
-  async getById(id: string): Promise<authModel | null> {
-    // Single query with leftJoin to avoid N+1 problem
-    const result = await this.db
+  async getById(id: string): Promise<AuthEntity | null> {
+    const clientResult = await this.db
       .select()
       .from(clients)
       .leftJoin(profiles, eq(clients.id, profiles.clientId))
       .where(eq(clients.publicId, id))
       .limit(1);
 
-    if (!result.length) {
-      return null;
+    if (clientResult.length) {
+      const { clients: client, profiles: profile } = clientResult[0];
+      return {
+        type: "user",
+        user: new authModel(
+          client.id,
+          client.publicId,
+          profile?.fullName ?? "",
+          client.email,
+          client.password,
+          profile?.phone ?? undefined,
+          client.createdAt,
+          client.updatedAt,
+        ),
+      };
     }
 
-    const { clients: client, profiles: profile } = result[0];
+    const workerResult = await this.db
+      .select()
+      .from(workers)
+      .leftJoin(workerProfiles, eq(workers.id, workerProfiles.workerId))
+      .where(eq(workers.publicId, id))
+      .limit(1);
 
-    return new authModel(
-      client.id,
-      client.publicId,
-      profile?.fullName ?? "",
-      client.email,
-      client.password,
-      profile?.phone ?? undefined,
-      client.createdAt,
-      client.updatedAt,
-    );
+    if (workerResult.length) {
+      const { workers: worker, worker_profiles: profile } = workerResult[0];
+      return {
+        type: "worker",
+        user: new authModel(
+          worker.id,
+          worker.publicId,
+          profile?.fullName ?? "",
+          profile?.email ?? "",
+          profile?.password ?? "",
+          profile?.phone ?? undefined,
+          worker.createdAt,
+          worker.updatedAt,
+        ),
+      };
+    }
+
+    return null;
   }
 }

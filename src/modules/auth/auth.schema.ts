@@ -36,6 +36,7 @@ export const LoginResponseSchema = z.object({
     user: z.object({
       publicId: z.string(),
       email: z.email(),
+      userType: z.enum(["user", "worker"]),
       profile: ProfileResponseSchema,
     }),
   }),
