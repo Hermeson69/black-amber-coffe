@@ -1,19 +1,16 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import { clients, profiles } from "@/db/schema";
-import authModel from "@/modules/auth/auth.model";
+import UserModel from "./user.model";
 
-export default class userRepository {
+export default class UserRepository {
   db: ReturnType<typeof drizzle>;
 
   constructor(db: ReturnType<typeof drizzle>) {
     this.db = db;
   }
 
-  /**
-   * Get user by publicId with profile data in single query
-   */
-  async getByPublicId(publicId: string): Promise<authModel | null> {
+  async getByPublicId(publicId: string): Promise<UserModel | null> {
     const result = await this.db
       .select()
       .from(clients)
@@ -26,29 +23,23 @@ export default class userRepository {
     }
 
     const { clients: clientRow, profiles: profileRow } = result[0];
-
-    return new authModel(
-      clientRow.id,
-      clientRow.publicId,
-      profileRow?.fullName ?? "",
-      clientRow.email,
-      clientRow.password,
-      profileRow?.phone ?? undefined,
-      clientRow.createdAt,
-      clientRow.updatedAt,
-    );
+    return UserModel.fromDatabase(clientRow, profileRow);
   }
 
-  async update(data: authModel): Promise<authModel> {
-    // Use transaction to ensure atomicity: both tables updated or neither
+  async update(data: UserModel, password?: string): Promise<UserModel> {
     const result = await this.db.transaction(async (tx) => {
+      const updateData: any = {
+        email: data.email,
+        updatedAt: new Date(data.updatedAt),
+      };
+
+      if (password) {
+        updateData.password = password;
+      }
+
       const [updatedClient] = await tx
         .update(clients)
-        .set({
-          email: data.email,
-          password: data.password,
-          updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
-        })
+        .set(updateData)
         .where(eq(clients.publicId, data.publicId))
         .returning();
 
@@ -59,29 +50,23 @@ export default class userRepository {
       await tx
         .update(profiles)
         .set({
-          fullName: data.name,
-          phone: data.phone,
-          updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
+          fullName: data.profile.fullName,
+          phone: data.profile.phone,
+          avatarImage: data.profile.avatarImage,
+          updatedAt: new Date(data.profile.updatedAt),
         })
         .where(eq(profiles.clientId, updatedClient.id));
 
-      return new authModel(
-        updatedClient.id,
-        updatedClient.publicId,
-        data.name,
-        updatedClient.email,
-        updatedClient.password,
-        data.phone,
-        updatedClient.createdAt,
-        updatedClient.updatedAt,
-      );
+      return UserModel.fromDatabase(updatedClient, {
+        ...data.profile,
+        clientId: updatedClient.id,
+      });
     });
 
     return result;
   }
 
   async deleteByPublicId(id: string): Promise<void> {
-    // Use transaction to ensure both profile and client are deleted or neither
     await this.db.transaction(async (tx) => {
       const [client] = await tx
         .select()
@@ -93,10 +78,7 @@ export default class userRepository {
         return;
       }
 
-      // Delete profile first (foreign key constraint)
       await tx.delete(profiles).where(eq(profiles.clientId, client.id));
-
-      // Then delete client
       await tx.delete(clients).where(eq(clients.id, client.id));
     });
   }

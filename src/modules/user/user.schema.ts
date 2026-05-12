@@ -1,6 +1,5 @@
 import * as z from "zod";
 
-// User Profile Response
 export const UserProfileSchema = z.object({
   fullName: z.string(),
   phone: z.string().nullable(),
@@ -9,7 +8,6 @@ export const UserProfileSchema = z.object({
   updatedAt: z.string(),
 });
 
-// User Response - dados do usuário
 export const UserResponseSchema = z.object({
   publicId: z.string(),
   name: z.string(),
@@ -19,7 +17,6 @@ export const UserResponseSchema = z.object({
   updatedAt: z.string(),
 });
 
-// User Update Input - apenas campos atualizáveis
 export const UserUpdateInputSchema = z
   .object({
     name: z.string().min(1, "Name must not be empty").optional(),
@@ -35,18 +32,15 @@ export const UserUpdateInputSchema = z
     "At least one field must be provided for update",
   );
 
-// Get User Response - wrapper com data
 export const GetUserResponseSchema = z.object({
   data: UserResponseSchema,
 });
 
-// Update User Response - wrapper com data
 export const UpdateUserResponseSchema = z.object({
   data: UserResponseSchema,
   message: z.string().optional(),
 });
 
-// Types
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 export type UserResponse = z.infer<typeof UserResponseSchema>;
 export type UserUpdateInput = z.infer<typeof UserUpdateInputSchema>;

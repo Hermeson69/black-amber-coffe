@@ -5,6 +5,25 @@ import {
 } from "@/modules/user/user.schema";
 import { Request, Response } from "express";
 import handlers from "@/shared/handlers/handles";
+import helpers from "@/shared/helpers";
+
+
+function handleError(res: Response, err: unknown) {
+  const code = err instanceof Error ? err.message : "INTERNAL_ERROR";
+
+  const mapped = helpers[code] ?? {
+    status: 500,
+    message: "Erro interno no servidor.",
+  };
+
+  return res.status(mapped.status).json({
+    error: {
+      code: mapped.status === 500 ? "INTERNAL_ERROR" : code,
+      message: mapped.message,
+    },
+  });
+}
+
 
 export default class userController {
   private userService: userService;
@@ -32,7 +51,7 @@ export default class userController {
 
       res.status(200).json(response);
     } catch (error) {
-      handlers.error(res, error);
+      handleError(res, error);
     }
   }
 
@@ -58,7 +77,7 @@ export default class userController {
 
       res.status(200).json(response);
     } catch (error) {
-      handlers.error(res, error);
+      handleError(res, error);
     }
   }
 
@@ -77,7 +96,7 @@ export default class userController {
 
       res.status(204).send();
     } catch (error) {
-      handlers.error(res, error);
+      handleError(res, error);
     }
   }
 }
