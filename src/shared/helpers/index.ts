@@ -1,5 +1,9 @@
 const errorMap: Record<string, { status: number; message: string }> = {
   // Authentication Errors
+  "Invalid email or password": {
+    status: 401,
+    message: "Email ou senha inválidos.",
+  },
   INVALID_CREDENTIALS: {
     status: 401,
     message: "Email ou senha inválidos.",
@@ -21,30 +25,52 @@ const errorMap: Record<string, { status: number; message: string }> = {
     message: "Acesso negado. Você não tem permissão para esta operação.",
   },
 
-  // Client/User Errors
+  LOGIN_ERROR: {
+    status: 500,
+    message: "Usuario não encontrado.",
+  },
+
+  "Email already in use": {
+    status: 400,
+    message: "Este email já está registrado.",
+  },
+
+  // User/Client Errors
   CLIENT_ALREADY_EXISTS: {
     status: 400,
     message: "Já existe um cliente com esse email.",
   },
+  CLIENT_NOT_FOUND: {
+    status: 400,
+    message: "Cliente não encontrado.",
+  },
+  "User not found": {
+    status: 404,
+    message: "Usuário não encontrado.",
+  },
+  USER_NOT_FOUND: {
+    status: 404,
+    message: "Usuário não encontrado.",
+  },
+
+  // Worker Errors
   WORKER_ALREADY_EXISTS: {
     status: 400,
     message: "Já existe um funcionário com esse email.",
-  },
-  CLIENT_NOT_FOUND: {
-    status: 404,
-    message: "Cliente não encontrado.",
   },
   WORKER_NOT_FOUND: {
     status: 404,
     message: "Funcionário não encontrado.",
   },
+  "Worker not found": {
+    status: 404,
+    message: "Funcionário não encontrado.",
+  },
+
+  // Profile Errors
   PROFILE_NOT_FOUND: {
     status: 404,
     message: "Perfil não encontrado.",
-  },
-  USER_NOT_FOUND: {
-    status: 404,
-    message: "Usuário não encontrado.",
   },
 
   // Validation Errors
@@ -76,6 +102,11 @@ const errorMap: Record<string, { status: number; message: string }> = {
   MISSING_REQUIRED_FIELDS: {
     status: 400,
     message: "Campos obrigatórios não fornecidos.",
+  },
+
+  "At least one field must be provided for update": {
+    status: 400,
+    message: "Pelo menos um campo deve ser fornecido para atualização.",
   },
 
   // General Errors

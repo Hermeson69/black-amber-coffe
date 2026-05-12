@@ -6,6 +6,7 @@ import { healthRoutes } from "@/routes/health.routes";
 import { authRoutes } from "@/routes/auth.routes";
 import { userRoutes } from "@/routes/user.routes";
 import { seed } from "@/seed/seed";
+import { workerRoutes } from "./routes/worker.routes";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -55,9 +56,10 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use("/api", healthRoutes);
+app.use(healthRoutes);
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", workerRoutes);
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on PORT ${PORT}`);
