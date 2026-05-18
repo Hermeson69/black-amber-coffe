@@ -17,7 +17,7 @@ RUN npm ci --omit-dev
 
 
 ENV NODE_ENV=production
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl --fail http://localhost:3000/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl --fail http://localhost:8000/api/health || exit 1
 
-CMD ["node", "dist/src/server.js"]
+CMD ["node", "dist/server.js"]
 
