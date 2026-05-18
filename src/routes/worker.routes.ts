@@ -59,10 +59,10 @@ workerRoutes.get("/worker/get/me", AuthMiddleware, (req, res) =>
 
 /**
  * @swagger
- * /api/user/update/me:
+ * /api/worker/update/me:
  *   patch:
- *     summary: Update authenticated user information
- *     tags: [Users]
+ *     summary: Update authenticated worker information
+ *     tags: [Workers]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -81,13 +81,13 @@ workerRoutes.get("/worker/get/me", AuthMiddleware, (req, res) =>
  *                 type: string
  *     responses:
  *       200:
- *         description: User updated successfully
+ *         description: Worker updated successfully
  *       400:
  *         description: Invalid input
  *       401:
  *         description: Unauthorized
  *       404:
- *         description: User not found
+ *         description: Worker not found
  */
 workerRoutes.patch("/worker/update/me", AuthMiddleware, (req, res) =>
   workerCtrl.update(req, res),

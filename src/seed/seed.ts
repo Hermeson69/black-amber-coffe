@@ -35,6 +35,32 @@ export async function seed() {
   console.log("🌱 Iniciando seed...");
 
   try {
+    // If SEED_FORCE_RESET is set, remove existing seeded data so seed becomes "fresh"
+    if (process.env.SEED_FORCE_RESET === "true") {
+      console.log(
+        "⚠️ SEED_FORCE_RESET=true — removendo dados existentes antes de semear...",
+      );
+      await db.transaction(async (tx) => {
+        // Delete dependent/profile records first, then parent entities
+        await tx
+          .delete(workerProfiles)
+          .where(eq(workerProfiles.id, workerProfiles.id));
+        await tx.delete(workers).where(eq(workers.id, workers.id));
+
+        await tx.delete(profiles).where(eq(profiles.id, profiles.id));
+        await tx.delete(clients).where(eq(clients.id, clients.id));
+      });
+    }
+
+    // Quick connectivity check to provide clearer error when DB is unreachable
+    try {
+      await db.select().from(clients).limit(1);
+    } catch (connErr) {
+      console.error(
+        "❌ Não foi possível conectar ao banco de dados. Verifique `DATABASE_URL` e a conectividade.",
+      );
+      throw connErr;
+    }
     // Make seed idempotent per-record: create workers that are missing and ensure test client exists
     const existingWorkerProfile = await db
       .select()
