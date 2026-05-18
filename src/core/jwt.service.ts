@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { JWTEXPIRATION, JWTREFRESHSECRET, JWTSECRETKEY } from "../config/env";
+import { env } from "../config/env";
 /**
  * Interface for validate a token per role and type of user
  */
@@ -16,9 +16,10 @@ export default class JWTservice {
   private refresh: string;
 
   constructor() {
-    this.secret = JWTSECRETKEY ?? "seu_secret_padrao";
-    this.expriration = this.normalizeExpiration(JWTEXPIRATION);
-    this.refresh = JWTREFRESHSECRET ?? "seu_refresh_aqui";
+    this.secret = env.JWT_SECRET ?? "seu_secret_padrao";
+    this.expriration = this.normalizeExpiration(env.JWT_EXPIRATION);
+    this.refresh =
+      env.JWT_SECRET_REFRESH ?? env.REFRESH_SECRET ?? "seu_refresh_aqui";
   }
 
   private normalizeExpiration(value: string | undefined): string {

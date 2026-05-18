@@ -1,14 +1,22 @@
 import "dotenv/config";
+import express, { Response } from "express";
+import fs from "node:fs";
+import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
-import express from "express";
 import { healthRoutes } from "@/routes/health.routes";
 import { authRoutes } from "@/routes/auth.routes";
 import { userRoutes } from "@/routes/user.routes";
 import { seed } from "@/seed/seed";
-import { workerRoutes } from "./routes/worker.routes";
+import { workerRoutes } from "@/routes/worker.routes";
+import { env } from "@/config/env";
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT || 3000;
+
+const swaggerRouteGlobs = [
+  path.join(__dirname, "routes", "*.ts"),
+  path.join(__dirname, "routes", "*.js"),
+].filter((glob) => fs.existsSync(path.dirname(glob)));
 
 app.use(express.json());
 
@@ -36,7 +44,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://localhost:${PORT}`,
+        url: "/v1",
+        description: "API v1",
       },
     ],
     components: {
@@ -50,20 +59,26 @@ const swaggerOptions = {
       },
     },
   },
-  apis: ["./src/routes/*.ts"],
+  apis: swaggerRouteGlobs,
 };
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(healthRoutes);
-app.use("/api", authRoutes);
-app.use("/api", userRoutes);
-app.use("/api", workerRoutes);
+app.use("/api", healthRoutes);
+app.use("/v1/api", authRoutes);
+app.use("/v1/api", userRoutes);
+app.use("/v1/api", workerRoutes);
+
+app.use((_req, res: Response) => {
+  res.status(404).json({ data: { message: "not found" } });
+});
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on PORT ${PORT}`);
-  console.log(`📚 Docs available at http://localhost:${PORT}/docs`);
+  console.log(`📚 Docs v1 available at http://localhost:${PORT}/v1/docs`);
 
   if (process.env.NODE_ENV !== "production") {
     try {

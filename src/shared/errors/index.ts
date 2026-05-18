@@ -1,8 +1,8 @@
 import pino from "pino";
-import { isDev } from "@/config/env";
+import { env } from "@/config/env";
 
 export const logger = pino({
-  transport: isDev
+  transport: env.isDev
     ? {
         target: "pino-pretty",
         options: {

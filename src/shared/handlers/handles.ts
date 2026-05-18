@@ -1,6 +1,6 @@
 import { Response } from "express";
 import helpers from "@/shared/helpers";
-import { isDev } from "@/config/env";
+import { env } from "@/config/env";
 import { logger } from "@/shared/errors";
 
 const error = (res: Response, err: unknown) => {
@@ -11,7 +11,7 @@ const error = (res: Response, err: unknown) => {
     message: "Erro interno no servidor.",
   };
 
-  if (isDev && mapped.status == 500) {
+  if (env.isDev && mapped.status == 500) {
     logger.error(code);
     mapped.message = code;
   }
