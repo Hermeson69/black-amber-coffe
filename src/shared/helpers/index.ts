@@ -1,9 +1,5 @@
 const errorMap: Record<string, { status: number; message: string }> = {
   // Authentication Errors
-  "Invalid email or password": {
-    status: 401,
-    message: "Email ou senha inválidos.",
-  },
   INVALID_CREDENTIALS: {
     status: 401,
     message: "Email ou senha inválidos.",
@@ -16,6 +12,10 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 401,
     message: "Token expirado. Faça login novamente.",
   },
+  INVALID_REFRESH_TOKEN: {
+    status: 401,
+    message: "Refresh token inválido ou expirado.",
+  },
   UNAUTHORIZED: {
     status: 401,
     message: "Token de autenticação não fornecido.",
@@ -25,12 +25,8 @@ const errorMap: Record<string, { status: number; message: string }> = {
     message: "Acesso negado. Você não tem permissão para esta operação.",
   },
 
-  LOGIN_ERROR: {
-    status: 500,
-    message: "Usuario não encontrado.",
-  },
-
-  "Email already in use": {
+  // Authentication - Email/Password
+  EMAIL_ALREADY_IN_USE: {
     status: 400,
     message: "Este email já está registrado.",
   },
@@ -41,12 +37,8 @@ const errorMap: Record<string, { status: number; message: string }> = {
     message: "Já existe um cliente com esse email.",
   },
   CLIENT_NOT_FOUND: {
-    status: 400,
-    message: "Cliente não encontrado.",
-  },
-  "User not found": {
     status: 404,
-    message: "Usuário não encontrado.",
+    message: "Cliente não encontrado.",
   },
   USER_NOT_FOUND: {
     status: 404,
@@ -62,15 +54,25 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 404,
     message: "Funcionário não encontrado.",
   },
-  "Worker not found": {
-    status: 404,
-    message: "Funcionário não encontrado.",
-  },
 
   // Profile Errors
   PROFILE_NOT_FOUND: {
     status: 404,
     message: "Perfil não encontrado.",
+  },
+
+  // Password Reset Errors
+  INVALID_RESET_CODE: {
+    status: 400,
+    message: "Código de reset inválido.",
+  },
+  EXPIRED_RESET_CODE: {
+    status: 400,
+    message: "Código de reset expirado.",
+  },
+  PASSWORD_MISMATCH: {
+    status: 400,
+    message: "As senhas não conferem.",
   },
 
   // Validation Errors
@@ -103,13 +105,26 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 400,
     message: "Campos obrigatórios não fornecidos.",
   },
-
-  "At least one field must be provided for update": {
+  UPDATE_REQUIRES_FIELDS: {
     status: 400,
     message: "Pelo menos um campo deve ser fornecido para atualização.",
   },
 
-  // General Errors
+  // Password Reset Errors
+  INVALID_RESET_CODE: {
+    status: 400,
+    message: "Código de reset inválido ou expirado.",
+  },
+  PASSWORD_RESET_CODE_EXPIRED: {
+    status: 400,
+    message: "Código de reset expirado.",
+  },
+  PASSWORD_MISMATCH: {
+    status: 400,
+    message: "As senhas não conferem.",
+  },
+
+  // Database/Configuration Errors
   NOT_FOUND: {
     status: 404,
     message: "Recurso não encontrado.",
@@ -121,6 +136,10 @@ const errorMap: Record<string, { status: number; message: string }> = {
   BAD_REQUEST: {
     status: 400,
     message: "Solicitação inválida.",
+  },
+  DATABASE_CONNECTION_ERROR: {
+    status: 500,
+    message: "Erro de configuração do banco de dados.",
   },
 };
 

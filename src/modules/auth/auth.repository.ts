@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { clients, profiles, workers, workerProfiles } from "@/db/schema";
 import authModel from "@/modules/auth/auth.model";
 
@@ -10,8 +10,15 @@ export interface AuthEntity {
   user: authModel;
 }
 
+interface PasswordReset {
+  email: string;
+  code: string;
+  expiresAt: Date;
+}
+
 export default class authRepository {
   db: ReturnType<typeof drizzle>;
+  private passwordResets: Map<string, PasswordReset> = new Map();
 
   constructor(db: ReturnType<typeof drizzle>) {
     this.db = db;
@@ -160,5 +167,47 @@ export default class authRepository {
     }
 
     return null;
+  }
+
+  async createPasswordReset(
+    email: string,
+    code: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    this.passwordResets.set(code, {
+      email,
+      code,
+      expiresAt,
+    });
+  }
+
+  async getPasswordReset(code: string): Promise<PasswordReset | null> {
+    const reset = this.passwordResets.get(code);
+    if (!reset) {
+      return null;
+    }
+
+    // Verifica se não expirou
+    if (new Date() > reset.expiresAt) {
+      this.passwordResets.delete(code);
+      return null;
+    }
+
+    return reset;
+  }
+
+  async deletePasswordReset(code: string): Promise<void> {
+    this.passwordResets.delete(code);
+  }
+
+  async updateUserPassword(
+    userId: number,
+    hashedPassword: string,
+  ): Promise<void> {
+    // Atualiza a senha no banco de dados
+    await this.db
+      .update(clients)
+      .set({ password: hashedPassword, updatedAt: new Date() })
+      .where(eq(clients.id, userId));
   }
 }

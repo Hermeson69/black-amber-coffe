@@ -18,7 +18,7 @@ export default class WorkerService {
   async getByPublicId(publicId: string): Promise<Worker> {
     const worker = await this.workerRepository.getByPublicId(publicId);
     if (!worker) {
-      throw new Error("Worker not found");
+      throw new Error("WORKER_NOT_FOUND");
     }
 
     return WorkerResponseSchema.parse({
@@ -42,7 +42,7 @@ export default class WorkerService {
   async getById(id: number): Promise<Worker> {
     const worker = await this.workerRepository.getById(id);
     if (!worker) {
-      throw new Error("Worker not found");
+      throw new Error("WORKER_NOT_FOUND");
     }
 
     return WorkerResponseSchema.parse({
@@ -68,7 +68,7 @@ export default class WorkerService {
 
     const worker = await this.workerRepository.getByPublicId(publicId);
     if (!worker) {
-      throw new Error("Worker not found");
+      throw new Error("WORKER_NOT_FOUND");
     }
 
     let password = worker.profile.password;
@@ -118,7 +118,7 @@ export default class WorkerService {
   async delete(publicId: string): Promise<void> {
     const worker = await this.workerRepository.getByPublicId(publicId);
     if (!worker) {
-      throw new Error("Worker not found");
+      throw new Error("WORKER_NOT_FOUND");
     }
     await this.workerRepository.deleteByPublicId(publicId);
   }

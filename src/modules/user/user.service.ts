@@ -21,7 +21,7 @@ export default class UserService {
   async get(publicId: string): Promise<UserResponse> {
     const user = await this.userRepository.getByPublicId(publicId);
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("USER_NOT_FOUND");
     }
 
     return UserResponseSchema.parse({
@@ -48,7 +48,7 @@ export default class UserService {
 
     const user = await this.userRepository.getByPublicId(publicId);
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("USER_NOT_FOUND");
     }
 
     let password = undefined;
@@ -92,7 +92,7 @@ export default class UserService {
   async deleteClient(publicId: string): Promise<void> {
     const user = await this.userRepository.getByPublicId(publicId);
     if (!user) {
-      throw new Error("User not found");
+      throw new Error("USER_NOT_FOUND");
     }
     await this.userRepository.deleteByPublicId(publicId);
   }

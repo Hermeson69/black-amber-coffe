@@ -44,7 +44,7 @@ export default class UserRepository {
         .returning();
 
       if (!updatedClient) {
-        throw new Error("Client not found");
+        throw new Error("CLIENT_NOT_FOUND");
       }
 
       await tx
