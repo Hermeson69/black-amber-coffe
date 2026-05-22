@@ -11,9 +11,6 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(3000),
 
   DATABASE_URL: z.string().url(),
-  DB_NAME: z.string().min(1),
-  DB_USER: z.string().min(1),
-  DB_PASSWORD: z.string().min(1),
 
   JWT_SECRET: z.string().min(16),
   JWT_EXPIRATION: z.string().default("15m"),
