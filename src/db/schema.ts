@@ -12,19 +12,23 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
-//  Enums 
+//  Enums
 
 export const workerRolesEnum = pgEnum("worker_roles", WorkerRoles.values());
 export const orderStatusEnum = pgEnum("order_status", OrderStatus.values());
 
-//  Helpers 
+//  Helpers
 
 const timestamps = {
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 };
 
-//  Tables 
+//  Tables
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
   publicId: text("public_id").notNull().unique(),
@@ -39,13 +43,15 @@ export const workers = pgTable("workers", {
   role: workerRolesEnum("role").notNull(),
   salary: numeric("salary", { precision: 10, scale: 2 }).notNull(),
   isActive: boolean("is_active").notNull().default(true),
-  isAdmin: boolean("is_admin").notNull().default(false), 
+  isAdmin: boolean("is_admin").notNull().default(false),
   ...timestamps,
 });
 
 export const workerProfiles = pgTable("worker_profiles", {
   id: serial("id").primaryKey(),
-  workerId: integer("worker_id").notNull().references(() => workers.id, { onDelete: "cascade" }),
+  workerId: integer("worker_id")
+    .notNull()
+    .references(() => workers.id, { onDelete: "cascade" }),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   fullName: text("full_name").notNull(),
@@ -56,7 +62,9 @@ export const workerProfiles = pgTable("worker_profiles", {
 
 export const profiles = pgTable("profiles", {
   id: serial("id").primaryKey(),
-  clientId: integer("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
+  clientId: integer("client_id")
+    .notNull()
+    .references(() => clients.id, { onDelete: "cascade" }),
   fullName: text("full_name").notNull(),
   phone: text("phone"),
   avatarImage: text("avatar_image"),
@@ -71,54 +79,84 @@ export const products = pgTable("products", {
   size: text("size"),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   category: text("category").notNull(),
-  isActive: boolean("is_active").notNull().default(true), 
+  isActive: boolean("is_active").notNull().default(true),
   ...timestamps,
 });
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   publicId: text("public_id").notNull().unique(),
-  clientId: integer("client_id").notNull().references(() => clients.id),
+  clientId: integer("client_id")
+    .notNull()
+    .references(() => clients.id),
   totalAmount: numeric("total_amount", { precision: 10, scale: 2 }).notNull(),
   status: orderStatusEnum("status").notNull(),
   observation: text("observation"),
-  ...timestamps, 
+  ...timestamps,
 });
 
 export const orderItems = pgTable("order_items", {
   id: serial("id").primaryKey(),
-  orderId: integer("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
-  productId: integer("product_id").notNull().references(() => products.id),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
+  productId: integer("product_id")
+    .notNull()
+    .references(() => products.id),
   quantity: integer("quantity").notNull().default(1),
-  unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(), 
+  unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
   ...timestamps,
 });
 
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
-  orderId: integer("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   method: text("method").notNull(),
   ...timestamps,
 });
 
-//  Relations 
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
+  code: text("code").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+//  Relations
 export const clientsRelations = relations(clients, ({ one, many }) => ({
-  profile: one(profiles, { fields: [clients.id], references: [profiles.clientId] }),
+  profile: one(profiles, {
+    fields: [clients.id],
+    references: [profiles.clientId],
+  }),
   orders: many(orders),
 }));
 
 export const workersRelations = relations(workers, ({ one }) => ({
-  profile: one(workerProfiles, { fields: [workers.id], references: [workerProfiles.workerId] }),
+  profile: one(workerProfiles, {
+    fields: [workers.id],
+    references: [workerProfiles.workerId],
+  }),
 }));
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   client: one(clients, { fields: [orders.clientId], references: [clients.id] }),
   items: many(orderItems),
-  payment: one(payments, { fields: [orders.id], references: [payments.orderId] }),
+  payment: one(payments, {
+    fields: [orders.id],
+    references: [payments.orderId],
+  }),
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
-  product: one(products, { fields: [orderItems.productId], references: [products.id] }),
+  product: one(products, {
+    fields: [orderItems.productId],
+    references: [products.id],
+  }),
 }));
