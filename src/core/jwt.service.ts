@@ -84,4 +84,18 @@ export default class JWTservice {
   generateRefreshToken(userId: string): string {
     return jwt.sign({ id: userId }, this.refresh!, { expiresIn: "30d" });
   }
+
+  /**
+   * Verificar o refresh token do usuario
+   * @param token
+   * @returns o decoded para ver se é valido
+   */
+  verifyRefreshToken(token: string): { id: string } | null {
+    try {
+      const decoded = jwt.verify(token, this.refresh!) as { id: string };
+      return decoded;
+    } catch (error) {
+      return null;
+    }
+  }
 }
