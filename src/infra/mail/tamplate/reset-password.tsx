@@ -223,7 +223,7 @@ const headerDividerLine: React.CSSProperties = {
   display: "inline-block",
   flex: "1",
   height: "1px",
-  backgroundColor: "rgba(249,115,22,0.4)",
+  backgroundColor: "#EA6A00",
 };
 
 const headerDividerDot: React.CSSProperties = {
