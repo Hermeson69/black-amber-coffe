@@ -1,6 +1,7 @@
 import SecurityUtils from "@/core/security";
 import authRepository from "@/modules/auth/auth.repository";
 import UserRepository from "@/modules/user/user.repository";
+import { r2StorageProvider, imageService } from "@/infra/storage";
 import UserModel from "@/modules/user/user.model";
 import {
   UserUpdateInput,
@@ -32,11 +33,11 @@ export default class UserService {
         fullName: user.profile.fullName,
         phone: user.profile.phone,
         avatarImage: user.profile.avatarImage,
-        createdAt: user.profile.createdAt,
-        updatedAt: user.profile.updatedAt,
+        createdAt: new Date(user.profile.createdAt).toISOString(),
+        updatedAt: new Date(user.profile.updatedAt).toISOString(),
       },
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
+      createdAt: new Date(user.createdAt).toISOString(),
+      updatedAt: new Date(user.updatedAt).toISOString(),
     });
   }
 
@@ -51,6 +52,23 @@ export default class UserService {
       throw new Error("USER_NOT_FOUND");
     }
 
+    let avatarImageUpdate: string | null = user.profile.avatarImage;
+
+    if (validatedData.profile.avatarBuffer) {
+      const processedImages = await imageService.processAvatar(
+        validatedData.profile.avatarBuffer,
+      );
+      const keys = imageService.generateAvatarKeys(publicId);
+
+      await r2StorageProvider.upload({
+        key: keys.large,
+        body: processedImages.large,
+        contentType: processedImages.contentType,
+      });
+
+      avatarImageUpdate = keys.large;
+    }
+
     let password = undefined;
     if (validatedData.password) {
       password = await SecurityUtils.hashPassword(validatedData.password);
@@ -63,9 +81,9 @@ export default class UserService {
       user.createdAt,
       new Date().toISOString(),
       {
-        fullName: validatedData.name ?? user.profile.fullName,
+        fullName: validatedData.fullName ?? user.profile.fullName,
         phone: validatedData.phone ?? user.profile.phone,
-        avatarImage: user.profile.avatarImage,
+        avatarImage: avatarImageUpdate,
         createdAt: user.profile.createdAt,
         updatedAt: new Date().toISOString(),
       },
@@ -81,11 +99,11 @@ export default class UserService {
         fullName: result.profile.fullName,
         phone: result.profile.phone,
         avatarImage: result.profile.avatarImage,
-        createdAt: result.profile.createdAt,
-        updatedAt: result.profile.updatedAt,
+        createdAt: new Date(result.profile.createdAt).toISOString(),
+        updatedAt: new Date(result.profile.updatedAt).toISOString(),
       },
-      createdAt: result.createdAt,
-      updatedAt: result.updatedAt,
+      createdAt: new Date(result.createdAt).toISOString(),
+      updatedAt: new Date(result.updatedAt).toISOString(),
     });
   }
 

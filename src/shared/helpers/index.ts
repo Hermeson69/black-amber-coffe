@@ -66,6 +66,18 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 400,
     message: "Código de reset inválido.",
   },
+  EXPIRED_CODE: {
+    status: 400,
+    message: "Código de reset expirado.",
+  },
+  CODE_ALREADY_USED: {
+    status: 400,
+    message: "Código de reset já utilizado.",
+  },
+  INVALID_CODE: {
+    status: 400,
+    message: "Código de reset inválido.",
+  },
   EXPIRED_RESET_CODE: {
     status: 400,
     message: "Código de reset expirado.",
@@ -100,6 +112,14 @@ const errorMap: Record<string, { status: number; message: string }> = {
   INVALID_REQUEST: {
     status: 400,
     message: "Requisição inválida. Verifique os parâmetros enviados.",
+  },
+  INVALID_FILE_TYPE: {
+    status: 400,
+    message: "Arquivo inválido. Envie uma imagem.",
+  },
+  LIMIT_FILE_SIZE: {
+    status: 400,
+    message: "Arquivo muito grande. O limite é 5MB.",
   },
   MISSING_REQUIRED_FIELDS: {
     status: 400,

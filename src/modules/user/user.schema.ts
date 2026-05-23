@@ -3,6 +3,7 @@ import * as z from "zod";
 export const UserProfileSchema = z.object({
   fullName: z.string(),
   phone: z.string().nullable(),
+  avatarBuffer: z.instanceof(Buffer).optional(),
   avatarImage: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -19,13 +20,14 @@ export const UserResponseSchema = z.object({
 
 export const UserUpdateInputSchema = z
   .object({
-    name: z.string().min(1, "Name must not be empty").optional(),
+    fullName: z.string().min(2, "Full name must not be empty").optional(),
     email: z.email("Invalid email address").optional(),
     phone: z.string().min(1, "Phone must not be empty").optional(),
     password: z
       .string()
       .min(6, "Password must be at least 6 characters long")
       .optional(),
+    profile: UserProfileSchema,
   })
   .refine(
     (data) => Object.keys(data).length > 0,

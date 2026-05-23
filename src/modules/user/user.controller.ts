@@ -2,13 +2,14 @@ import userService from "@/modules/user/user.service";
 import {
   GetUserResponseSchema,
   UpdateUserResponseSchema,
+  UserUpdateInputSchema,
 } from "@/modules/user/user.schema";
 import { Request, Response } from "express";
-import handlers from "@/shared/handlers/handles";
 import helpers from "@/shared/helpers";
 
-
 function handleError(res: Response, err: unknown) {
+  console.error("USER CONTROLLER ERROR:", err);
+
   const code = err instanceof Error ? err.message : "INTERNAL_ERROR";
 
   const mapped = helpers[code] ?? {
@@ -23,7 +24,6 @@ function handleError(res: Response, err: unknown) {
     },
   });
 }
-
 
 export default class userController {
   private userService: userService;
@@ -66,7 +66,25 @@ export default class userController {
         res.status(401).json({ error: "Unauthorized" });
         return;
       }
-      const data = req.body;
+
+      const currentUser = await this.userService.get(publicId);
+      const avatarBuffer = req.file?.buffer;
+      const fullName = req.body.fullName ?? req.body.name ?? currentUser.name;
+
+      const data = UserUpdateInputSchema.parse({
+        fullName,
+        email: req.body.email,
+        phone: req.body.phone,
+        password: req.body.password,
+        profile: {
+          fullName,
+          phone: req.body.phone ?? currentUser.profile.phone,
+          avatarBuffer,
+          avatarImage: currentUser.profile.avatarImage,
+          createdAt: currentUser.profile.createdAt,
+          updatedAt: currentUser.profile.updatedAt,
+        },
+      });
 
       const updatedUser = await this.userService.updateClient(publicId, data);
 

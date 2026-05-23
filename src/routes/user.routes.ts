@@ -4,6 +4,7 @@ import userService from "@/modules/user/user.service";
 import userRepository from "@/modules/user/user.repository";
 import authRepository from "@/modules/auth/auth.repository";
 import { AuthMiddleware } from "@/modules/auth/auth.middleware";
+import { avatarUploadMiddleware } from "@/shared/middlewares/upload.middleware";
 import { db } from "@/config/database";
 
 const userRoutes = Router();
@@ -61,38 +62,89 @@ userRoutes.get("/user/get/me", AuthMiddleware, (req, res) =>
 
 /**
  * @swagger
- * /api/user/update/me:
- *   patch:
- *     summary: Update authenticated user information
+ * /api/users/me:
+ *   put:
+ *     summary: Atualizar perfil do usuário autenticado
+ *     description: Atualiza o nome completo, email, telefone, senha e/ou foto de perfil do usuário autenticado.
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
+ *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               fullName:
  *                 type: string
+ *                 description: Nome completo do usuário.
+ *                 example: Hermeson Alves de Oliveira
  *               email:
  *                 type: string
+ *                 format: email
+ *                 description: Email do usuário.
+ *                 example: hermesonalves256@gmail.com
  *               phone:
  *                 type: string
+ *                 description: Telefone do usuário.
+ *                 example: 11999999999
  *               password:
  *                 type: string
+ *                 description: Nova senha do usuário.
+ *                 example: Senha@123
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *                 description: Imagem de avatar em jpg, png ou webp.
  *     responses:
  *       200:
- *         description: User updated successfully
+ *         description: Perfil atualizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     publicId:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     createdAt:
+ *                       type: string
+ *                     updatedAt:
+ *                       type: string
+ *                     profile:
+ *                       type: object
+ *                       properties:
+ *                         fullName:
+ *                           type: string
+ *                         avatarImage:
+ *                           type: string
+ *                           nullable: true
+ *                         createdAt:
+ *                           type: string
  *       400:
- *         description: Invalid input
+ *         description: Erro de validação.
  *       401:
- *         description: Unauthorized
+ *         description: Token de autenticação ausente, inválido ou expirado.
  *       404:
- *         description: User not found
+ *         description: Usuário não encontrado.
  */
-userRoutes.patch("/user/update/me", AuthMiddleware, (req, res) =>
-  userCtrl.update(req, res),
+userRoutes.put(
+  "/users/me",
+  AuthMiddleware,
+  avatarUploadMiddleware,
+  (req, res) => userCtrl.update(req, res),
+);
+
+userRoutes.patch(
+  "/user/update/me",
+  AuthMiddleware,
+  avatarUploadMiddleware,
+  (req, res) => userCtrl.update(req, res),
 );
 
 /**

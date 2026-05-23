@@ -47,15 +47,32 @@ export default class UserRepository {
         throw new Error("CLIENT_NOT_FOUND");
       }
 
-      await tx
-        .update(profiles)
-        .set({
+      const [existingProfile] = await tx
+        .select()
+        .from(profiles)
+        .where(eq(profiles.clientId, updatedClient.id))
+        .limit(1);
+
+      if (existingProfile) {
+        await tx
+          .update(profiles)
+          .set({
+            fullName: data.profile.fullName,
+            phone: data.profile.phone,
+            avatarImage: data.profile.avatarImage,
+            updatedAt: new Date(data.profile.updatedAt),
+          })
+          .where(eq(profiles.clientId, updatedClient.id));
+      } else {
+        await tx.insert(profiles).values({
+          clientId: updatedClient.id,
           fullName: data.profile.fullName,
           phone: data.profile.phone,
           avatarImage: data.profile.avatarImage,
+          createdAt: new Date(data.profile.createdAt),
           updatedAt: new Date(data.profile.updatedAt),
-        })
-        .where(eq(profiles.clientId, updatedClient.id));
+        });
+      }
 
       return UserModel.fromDatabase(updatedClient, {
         ...data.profile,
