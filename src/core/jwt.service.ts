@@ -10,6 +10,11 @@ interface JWTPayload {
   role?: string;
 }
 
+interface PasswordResetPayload {
+  userId: number;
+  publicUserId: string;
+}
+
 export default class JWTservice {
   private secret: string;
   private expriration: string;
@@ -93,6 +98,21 @@ export default class JWTservice {
   verifyRefreshToken(token: string): { id: string } | null {
     try {
       const decoded = jwt.verify(token, this.refresh!) as { id: string };
+      return decoded;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  generatePasswordResetToken(payload: PasswordResetPayload): string {
+    return jwt.sign(payload, this.secret, {
+      expiresIn: "10m",
+    });
+  }
+
+  verifyPasswordResetToken(token: string): PasswordResetPayload | null {
+    try {
+      const decoded = jwt.verify(token, this.secret) as PasswordResetPayload;
       return decoded;
     } catch (error) {
       return null;
