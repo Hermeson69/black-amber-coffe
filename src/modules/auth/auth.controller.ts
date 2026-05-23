@@ -100,7 +100,7 @@ export default class authController {
     try {
       const data: CheckPasswordResetInput = req.body;
       const response: CheckPasswordResetResponse =
-        await this.authService.checkPasswordReset(data);
+        await this.authService.checkPasswordReset(data.userTokenId, data);
       res.status(200).json(response);
     } catch (error) {
       handleError(res, error);
@@ -111,7 +111,7 @@ export default class authController {
     try {
       const data: ResetPasswordInput = req.body;
       const response: ResetPasswordResponse =
-        await this.authService.resetPassword(data);
+        await this.authService.resetPassword(data.resetToken, data);
       res.status(200).json(response);
     } catch (error) {
       handleError(res, error);

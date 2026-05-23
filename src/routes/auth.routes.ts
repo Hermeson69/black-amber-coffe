@@ -57,8 +57,6 @@ const clientController = new authController(clientService);
  *                       type: string
  *                     updatedAt:
  *                       type: string
- *                     name:
- *                       type: string
  *                     profile:
  *                       type: object
  *                       properties:
@@ -267,11 +265,13 @@ authRoutes.post("/auth/logout", clientController.logout.bind(clientController));
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: object
- *                   properties:
- *                     message:
- *                       type: string
+ *                 email:
+ *                   type: string
+ *                 userTokenId:
+ *                   type: string
+ *                   nullable: true
+ *                 expiresAt:
+ *                   type: string
  */
 authRoutes.post(
   "/auth/forgotpassword/send",
@@ -293,9 +293,12 @@ authRoutes.post(
  *           schema:
  *             type: object
  *             properties:
+ *               userTokenId:
+ *                 type: string
  *               code:
  *                 type: string
  *             required:
+ *               - userTokenId
  *               - code
  *     responses:
  *       200:
@@ -305,11 +308,8 @@ authRoutes.post(
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: object
- *                   properties:
- *                     valid:
- *                       type: boolean
+ *                 resetToken:
+ *                   type: string
  */
 authRoutes.post(
   "/auth/forgotpassword/check",
@@ -321,7 +321,7 @@ authRoutes.post(
  * /api/auth/forgotpassword/reset:
  *   post:
  *     summary: Resetar senha
- *     description: Reseta a senha do usuário com um código válido
+ *     description: Reseta a senha do usuário com um token de reset válido
  *     tags:
  *       - ForgotPassword
  *     requestBody:
@@ -331,14 +331,14 @@ authRoutes.post(
  *           schema:
  *             type: object
  *             properties:
- *               code:
+ *               resetToken:
  *                 type: string
  *               newPassword:
  *                 type: string
  *               confirmNewPassword:
  *                 type: string
  *             required:
- *               - code
+ *               - resetToken
  *               - newPassword
  *               - confirmNewPassword
  *     responses:
@@ -349,13 +349,12 @@ authRoutes.post(
  *             schema:
  *               type: object
  *               properties:
- *                 data:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 user:
  *                   type: object
- *                   properties:
- *                     message:
- *                       type: string
- *       400:
- *         description: Código inválido ou senhas não conferem
  */
 authRoutes.post(
   "/auth/forgotpassword/reset",

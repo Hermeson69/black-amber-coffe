@@ -50,12 +50,13 @@ export const SendPasswordResetSchema = z.object({
   email: z.email().min(6, "O email deve ter ao menos 6 caracteres."),
 });
 export const CheckPasswordResetSchema = z.object({
+  userTokenId: z.string().min(1, "Código de reset é obrigatório."),
   code: z.string().min(1, "Código de reset é obrigatório."),
 });
 
 export const ResetPasswordSchema = z
   .object({
-    code: z.string().min(1, "Código de reset é obrigatório."),
+    resetToken: z.string().min(1, "Token de reset é obrigatório."),
     newPassword: z
       .string()
       .min(6, "A senha deve ter ao menos 6 caracteres.")
@@ -95,20 +96,27 @@ export const LogoutResponseSchema = z.object({
 });
 
 export const SendPasswordResetResponseSchema = z.object({
-  data: z.object({
-    message: z.string(),
-  }),
+  email: z.email(),
+  userTokenId: z.string().nullable(),
+  expiresAt: z.date(),
 });
 
 export const CheckPasswordResetResponseSchema = z.object({
-  data: z.object({
-    valid: z.boolean(),
-  }),
+  resetToken: z.string(),
 });
 
 export const ResetPasswordResponseSchema = z.object({
-  data: z.object({
-    message: z.string(),
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  user: z.object({
+    publicId: z.string(),
+    email: z.email(),
+    profile: z.object({
+      fullName: z.string(),
+      phone: z.string().nullable(),
+      avatarImage: z.string().nullable(),
+      createdAt: z.string(),
+    }),
   }),
 });
 

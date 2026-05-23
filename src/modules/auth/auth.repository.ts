@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import { clients, profiles, workers, workerProfiles } from "@/db/schema";
+import { generateId } from "@/core/gereteId";
 import authModel from "@/modules/auth/auth.model";
 
 export type UserType = "user" | "worker";
@@ -11,14 +12,19 @@ export interface AuthEntity {
 }
 
 interface PasswordReset {
+  id: number;
+  publicId: string;
   email: string;
   code: string;
   expiresAt: Date;
+  usedAt: Date | null;
+  deletedAt: Date | null;
 }
 
 export default class authRepository {
   db: ReturnType<typeof drizzle>;
   private passwordResets: Map<string, PasswordReset> = new Map();
+  private passwordResetSequence = 1;
 
   constructor(db: ReturnType<typeof drizzle>) {
     this.db = db;
@@ -173,31 +179,51 @@ export default class authRepository {
     email: string,
     code: string,
     expiresAt: Date,
-  ): Promise<void> {
-    this.passwordResets.set(code, {
+  ): Promise<PasswordReset> {
+    for (const [storedCode, reset] of this.passwordResets.entries()) {
+      if (reset.email === email) {
+        this.passwordResets.delete(storedCode);
+      }
+    }
+
+    const reset: PasswordReset = {
+      id: this.passwordResetSequence++,
+      publicId: generateId(),
       email,
       code,
       expiresAt,
-    });
+      usedAt: null,
+      deletedAt: null,
+    };
+
+    this.passwordResets.set(reset.publicId, reset);
+
+    return reset;
   }
 
-  async getPasswordReset(code: string): Promise<PasswordReset | null> {
-    const reset = this.passwordResets.get(code);
+  async getPasswordReset(publicId: string): Promise<PasswordReset | null> {
+    const reset = this.passwordResets.get(publicId);
     if (!reset) {
       return null;
     }
 
-    // Verifica se não expirou
     if (new Date() > reset.expiresAt) {
-      this.passwordResets.delete(code);
+      reset.deletedAt = new Date();
       return null;
     }
 
     return reset;
   }
 
-  async deletePasswordReset(code: string): Promise<void> {
-    this.passwordResets.delete(code);
+  async markPasswordResetAsUsed(publicId: string): Promise<void> {
+    const reset = this.passwordResets.get(publicId);
+    if (!reset) {
+      return;
+    }
+
+    const now = new Date();
+    reset.usedAt = now;
+    reset.deletedAt = now;
   }
 
   async updateUserPassword(

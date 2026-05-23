@@ -32,6 +32,7 @@ import {
   CheckPasswordResetSchema,
   ResetPasswordSchema,
 } from "./auth.schema";
+import { mailService } from "@/infra/mail";
 
 export default class authService {
   private authRepository: authRepository;
@@ -186,63 +187,91 @@ export default class authService {
     const authEntity = await this.authRepository.getByEmail(
       validatedData.email,
     );
+
+    const genericExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
     if (!authEntity) {
-      throw new Error("USER_NOT_FOUND");
+      return SendPasswordResetResponseSchema.parse({
+        email: validatedData.email,
+        userTokenId: null,
+        expiresAt: genericExpiry,
+      });
     }
 
-    // Gera um código de 6 dígitos
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = genericExpiry;
 
-    // Expira em 5 minutos
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
-    // Guardar o email no lugar do userId para facilitar a recuperação
-    await this.authRepository.createPasswordReset(
+    const userToken = await this.authRepository.createPasswordReset(
       validatedData.email,
       code,
       expiresAt,
     );
 
-    // TODO: Enviar código por email
-    console.log(`Código de reset: ${code}`);
+    await mailService.send({
+      schema: "PASSWORD_RESET",
+      to: authEntity.user.email,
+      data: { code },
+    });
 
     return SendPasswordResetResponseSchema.parse({
-      data: {
-        message: "Código de reset enviado para o email registrado.",
-      },
+      email: validatedData.email,
+      userTokenId: userToken.publicId as string | null,
+      expiresAt,
     });
   }
 
   async checkPasswordReset(
+    userTokenId: string,
     data: CheckPasswordResetInput,
   ): Promise<CheckPasswordResetResponse> {
     const validatedData = CheckPasswordResetSchema.parse(data);
 
-    const reset = await this.authRepository.getPasswordReset(
-      validatedData.code,
-    );
-    const isValid = reset !== null;
+    const reset = await this.authRepository.getPasswordReset(userTokenId);
+    if (!reset) {
+      throw new Error("NOT_FOUND");
+    }
+
+    if (reset.expiresAt < new Date()) {
+      throw new Error("EXPIRED_CODE");
+    }
+
+    if (reset.usedAt || reset.deletedAt) {
+      throw new Error("CODE_ALREADY_USED");
+    }
+
+    const authEntity = await this.authRepository.getByEmail(reset.email);
+    if (!authEntity) {
+      throw new Error("USER_NOT_FOUND");
+    }
+
+    if (validatedData.code !== reset.code) {
+      throw new Error("INVALID_CODE");
+    }
+
+    await this.authRepository.markPasswordResetAsUsed(userTokenId);
+
+    const resetToken = this.jwtService.generatePasswordResetToken({
+      userId: authEntity.user.id,
+      publicUserId: authEntity.user.publicId,
+    });
 
     return CheckPasswordResetResponseSchema.parse({
-      data: {
-        valid: isValid,
-      },
+      resetToken,
     });
   }
 
   async resetPassword(
+    resetToken: string,
     data: ResetPasswordInput,
   ): Promise<ResetPasswordResponse> {
     const validatedData = ResetPasswordSchema.parse(data);
 
-    const reset = await this.authRepository.getPasswordReset(
-      validatedData.code,
-    );
-    if (!reset) {
-      throw new Error("INVALID_RESET_CODE");
+    const decoded = this.jwtService.verifyPasswordResetToken(resetToken);
+    if (!decoded) {
+      throw new Error("INVALID_TOKEN");
     }
 
-    const authEntity = await this.authRepository.getByEmail(reset.email);
+    const authEntity = await this.authRepository.getById(decoded.publicUserId);
     if (!authEntity) {
       throw new Error("USER_NOT_FOUND");
     }
@@ -258,12 +287,28 @@ export default class authService {
       hashedPassword,
     );
 
-    // Deletar o código de reset
-    await this.authRepository.deletePasswordReset(validatedData.code);
+    const accessToken = this.jwtService.generateToken({
+      id: authEntity.user.id,
+      email: authEntity.user.email,
+      publicId: authEntity.user.publicId,
+    });
+
+    const refreshToken = this.jwtService.generateRefreshToken(
+      authEntity.user.publicId,
+    );
 
     return ResetPasswordResponseSchema.parse({
-      data: {
-        message: "Senha atualizada com sucesso.",
+      accessToken,
+      refreshToken,
+      user: {
+        publicId: authEntity.user.publicId,
+        email: authEntity.user.email,
+        profile: {
+          fullName: authEntity.user.name,
+          phone: authEntity.user.phone ?? null,
+          avatarImage: null,
+          createdAt: authEntity.user.createdAt,
+        },
       },
     });
   }
