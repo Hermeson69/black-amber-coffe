@@ -5,22 +5,10 @@ import {
   UserUpdateInputSchema,
 } from "@/modules/user/user.schema";
 import { Request, Response } from "express";
-import helpers from "@/shared/helpers";
+import sharedHandlers from "@/shared/handlers/handles";
 
 function handleError(res: Response, err: unknown) {
-  const code = err instanceof Error ? err.message : "INTERNAL_ERROR";
-
-  const mapped = helpers[code] ?? {
-    status: 500,
-    message: "Erro interno no servidor.",
-  };
-
-  return res.status(mapped.status).json({
-    error: {
-      code: mapped.status === 500 ? "INTERNAL_ERROR" : code,
-      message: mapped.message,
-    },
-  });
+  return sharedHandlers.error(res, err);
 }
 
 export default class userController {
