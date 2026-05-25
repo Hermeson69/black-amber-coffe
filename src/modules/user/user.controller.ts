@@ -8,8 +8,6 @@ import { Request, Response } from "express";
 import helpers from "@/shared/helpers";
 
 function handleError(res: Response, err: unknown) {
-  console.error("USER CONTROLLER ERROR:", err);
-
   const code = err instanceof Error ? err.message : "INTERNAL_ERROR";
 
   const mapped = helpers[code] ?? {

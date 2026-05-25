@@ -130,18 +130,10 @@ const errorMap: Record<string, { status: number; message: string }> = {
     message: "Pelo menos um campo deve ser fornecido para atualização.",
   },
 
-  // Password Reset Errors
-  INVALID_RESET_CODE: {
-    status: 400,
-    message: "Código de reset inválido ou expirado.",
-  },
+
   PASSWORD_RESET_CODE_EXPIRED: {
     status: 400,
     message: "Código de reset expirado.",
-  },
-  PASSWORD_MISMATCH: {
-    status: 400,
-    message: "As senhas não conferem.",
   },
 
   // Database/Configuration Errors

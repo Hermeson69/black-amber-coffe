@@ -4,9 +4,7 @@ import {
   UpdateWorkerResponseSchema,
 } from "./worker.schema";
 import { Request, Response } from "express";
-import handlers from "@/shared/handlers/handles";
 import helpers from "@/shared/helpers";
-
 
 function handleError(res: Response, err: unknown) {
   const code = err instanceof Error ? err.message : "INTERNAL_ERROR";
@@ -23,7 +21,6 @@ function handleError(res: Response, err: unknown) {
     },
   });
 }
-
 
 export default class WorkerController {
   private workerService: WorkerService;
