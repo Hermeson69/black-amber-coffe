@@ -4,6 +4,7 @@ import cors from "cors";
 import { seed } from "@/seed/seed";
 import { env } from "@/config/env";
 import router from "@/routes/v1.route";
+import sharedHandlers from "@/shared/handlers/handles";
 const app = express();
 const PORT = env.PORT || 3000;
 
@@ -26,9 +27,11 @@ app.use((req, res, next) => {
 
 app.use("/v1", router);
 
-app.use((_req, res: Response) => {
-  res.status(404).json({ data: { message: "not found" } });
+app.use((_req, _res, next) => {
+  next(new Error("NOT_FOUND"));
 });
+
+app.use(sharedHandlers.error);
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on PORT ${PORT}`);
