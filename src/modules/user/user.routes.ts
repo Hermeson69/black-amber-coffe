@@ -5,6 +5,8 @@ import userRepository from "@/modules/user/user.repository";
 import authRepository from "@/modules/auth/auth.repository";
 import { AuthMiddleware } from "@/modules/auth/auth.middleware";
 import { avatarUploadMiddleware } from "@/shared/middlewares/upload.middleware";
+import validationMiddleware from "@/shared/middleware/validation.middleware";
+import { UserUpdateRequestSchema } from "@/modules/user/user.schema";
 import { db } from "@/config/database";
 
 const userRoutes = Router();
@@ -52,12 +54,13 @@ const userCtrl = new userController(userSvc);
  *                           type: string
  *                           nullable: true
  *       401:
- *         description: Unauthorized
+ *         description: Token ausente, inválido ou expirado.
+ 
  *       404:
- *         description: User not found
+ *         description: Usuário não encontrado.
  */
-userRoutes.get("/user/get/me", AuthMiddleware, (req, res) =>
-  userCtrl.getById(req, res),
+userRoutes.get("/user/me", AuthMiddleware, (req, res, next) =>
+  userCtrl.getById(req, res, next),
 );
 
 /**
@@ -134,17 +137,11 @@ userRoutes.get("/user/get/me", AuthMiddleware, (req, res) =>
  *         description: Usuário não encontrado.
  */
 userRoutes.put(
-  "/users/me",
+  "/user/me",
   AuthMiddleware,
   avatarUploadMiddleware,
-  (req, res) => userCtrl.update(req, res),
-);
-
-userRoutes.patch(
-  "/user/update/me",
-  AuthMiddleware,
-  avatarUploadMiddleware,
-  (req, res) => userCtrl.update(req, res),
+  validationMiddleware(UserUpdateRequestSchema),
+  (req, res, next) => userCtrl.update(req, res, next),
 );
 
 /**
@@ -163,8 +160,8 @@ userRoutes.patch(
  *       404:
  *         description: User not found
  */
-userRoutes.delete("/user/delete/me", AuthMiddleware, (req, res) =>
-  userCtrl.delete(req, res),
+userRoutes.delete("/user/delete/me", AuthMiddleware, (req, res, next) =>
+  userCtrl.delete(req, res, next),
 );
 
 export { userRoutes };

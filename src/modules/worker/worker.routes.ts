@@ -3,6 +3,8 @@ import WorkerController from "@/modules/worker/worker.controller";
 import WorkerService from "@/modules/worker/worker.service";
 import WorkerRepository from "@/modules/worker/worker.repository";
 import { AuthMiddleware } from "@/modules/auth/auth.middleware";
+import validationMiddleware from "@/shared/middleware/validation.middleware";
+import { WorkerUpdateRequestSchema } from "@/modules/worker/worker.schema";
 import { db } from "@/config/database";
 
 const workerRoutes = Router();
@@ -53,8 +55,8 @@ const workerCtrl = new WorkerController(workerSvc);
  *       404:
  *         description: Worker not found
  */
-workerRoutes.get("/worker/get/me", AuthMiddleware, (req, res) =>
-  workerCtrl.getById(req, res),
+workerRoutes.get("/worker/get/me", AuthMiddleware, (req, res, next) =>
+  workerCtrl.getById(req, res, next),
 );
 
 /**
@@ -89,8 +91,11 @@ workerRoutes.get("/worker/get/me", AuthMiddleware, (req, res) =>
  *       404:
  *         description: Worker not found
  */
-workerRoutes.patch("/worker/update/me", AuthMiddleware, (req, res) =>
-  workerCtrl.update(req, res),
+workerRoutes.patch(
+  "/worker/update/me",
+  AuthMiddleware,
+  validationMiddleware(WorkerUpdateRequestSchema),
+  (req, res, next) => workerCtrl.update(req, res, next),
 );
 
 /**
@@ -109,8 +114,8 @@ workerRoutes.patch("/worker/update/me", AuthMiddleware, (req, res) =>
  *       404:
  *         description: Worker not found
  */
-workerRoutes.delete("/worker/delete/me", AuthMiddleware, (req, res) =>
-  workerCtrl.delete(req, res),
+workerRoutes.delete("/worker/delete/me", AuthMiddleware, (req, res, next) =>
+  workerCtrl.delete(req, res, next),
 );
 
 export { workerRoutes };

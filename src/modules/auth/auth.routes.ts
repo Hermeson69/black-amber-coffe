@@ -1,10 +1,20 @@
 import { Router } from "express";
 
 import authController from "@/modules/auth/auth.controller";
+import {
+  RegisterClientSchema,
+  LoginClientSchema,
+  RefreshtokenSchema,
+  LogoutSchema,
+  SendPasswordResetSchema,
+  CheckPasswordResetSchema,
+  ResetPasswordSchema,
+} from "@/modules/auth/auth.schema";
 import authService from "@/modules/auth/auth.service";
 import authRepository from "@/modules/auth/auth.repository";
 import JWTservice from "@/core/jwt.service";
 import { db } from "@/config/database";
+import validationMiddleware from "@/shared/middleware/validation.middleware";
 
 const authRoutes = Router();
 
@@ -73,6 +83,7 @@ const clientController = new authController(clientService);
  */
 authRoutes.post(
   "/auth/register",
+  validationMiddleware(RegisterClientSchema),
   clientController.createClient.bind(clientController),
 );
 
@@ -137,9 +148,17 @@ authRoutes.post(
  *                               type: string
  *       400:
  *         description: Dados inválidos ou credenciais incorretas
+ *       404:
+ *         description: Cliente não encontrado
+ *       500:
+ *         description: Erro interno no servidor
  */
 
-authRoutes.post("/auth/login", clientController.login.bind(clientController));
+authRoutes.post(
+  "/auth/login",
+  validationMiddleware(LoginClientSchema),
+  clientController.login.bind(clientController),
+);
 
 /**
  * @swagger
@@ -181,6 +200,7 @@ authRoutes.post("/auth/login", clientController.login.bind(clientController));
  */
 authRoutes.post(
   "/auth/jwt/refresh-token",
+  validationMiddleware(RefreshtokenSchema),
   clientController.refreshToken.bind(clientController),
 );
 
@@ -235,7 +255,11 @@ authRoutes.post(
  *                     message:
  *                       type: string
  */
-authRoutes.post("/auth/logout", clientController.logout.bind(clientController));
+authRoutes.post(
+  "/auth/logout",
+  validationMiddleware(LogoutSchema),
+  clientController.logout.bind(clientController),
+);
 
 /**
  * @swagger
@@ -275,6 +299,7 @@ authRoutes.post("/auth/logout", clientController.logout.bind(clientController));
  */
 authRoutes.post(
   "/auth/forgotpassword/send",
+  validationMiddleware(SendPasswordResetSchema),
   clientController.sendPasswordReset.bind(clientController),
 );
 
@@ -313,6 +338,7 @@ authRoutes.post(
  */
 authRoutes.post(
   "/auth/forgotpassword/check",
+  validationMiddleware(CheckPasswordResetSchema),
   clientController.checkPasswordReset.bind(clientController),
 );
 
@@ -358,6 +384,7 @@ authRoutes.post(
  */
 authRoutes.post(
   "/auth/forgotpassword/reset",
+  validationMiddleware(ResetPasswordSchema),
   clientController.resetPassword.bind(clientController),
 );
 
