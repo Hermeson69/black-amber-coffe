@@ -1,33 +1,20 @@
-import { Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import helpers from "@/shared/helpers";
 import { env } from "@/config/env";
 import { logger } from "@/shared/errors";
 
-const error = (res: Response, err: unknown) => {
-  // Zod validation errors -> return 400 with details
-  if (err instanceof ZodError) {
-    const details: Record<string, string> = {};
-    err.issues.forEach((issue) => {
-      const key = issue.path.join(".") || "body";
-      if (!details[key]) details[key] = issue.message;
-    });
-
-    const mapped = helpers["BAD_REQUEST"] ?? {
-      status: 400,
-      message: "Requisição inválida. Verifique os campos.",
-    };
-
-    return res.status(mapped.status).json({
-      error: {
-        code: "BAD_REQUEST",
-        message: mapped.message,
-        details,
-      },
-    });
-  }
-
+const error = (
+  err: unknown,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+) => {
   let code = err instanceof Error ? err.message : "INTERNAL_ERROR";
+
+  if (err instanceof ZodError) {
+    code = "BAD_REQUEST";
+  }
 
   const mapped = helpers[code] ?? {
     status: 500,
@@ -50,7 +37,6 @@ const error = (res: Response, err: unknown) => {
     },
   });
 };
-
 export default {
   error,
 };
