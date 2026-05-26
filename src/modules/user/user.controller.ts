@@ -4,12 +4,7 @@ import {
   UpdateUserResponseSchema,
   UserUpdateInputSchema,
 } from "@/modules/user/user.schema";
-import { Request, Response } from "express";
-import sharedHandlers from "@/shared/handlers/handles";
-
-function handleError(res: Response, err: unknown) {
-  return sharedHandlers.error(res, err);
-}
+import { NextFunction, Request, Response } from "express";
 
 export default class userController {
   private userService: userService;
@@ -22,7 +17,11 @@ export default class userController {
    * GET /user/me
    * Retrieve authenticated user details
    */
-  async getById(req: Request, res: Response): Promise<void> {
+  async getById(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const publicId = req.user?.publicId;
       if (!publicId) {
@@ -37,7 +36,7 @@ export default class userController {
 
       res.status(200).json(response);
     } catch (error) {
-      handleError(res, error);
+      next(error);
     }
   }
 
@@ -45,7 +44,7 @@ export default class userController {
    * PATCH /user/me
    * Update authenticated user information
    */
-  async update(req: Request, res: Response): Promise<void> {
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const publicId = req.user?.publicId;
       if (!publicId) {
@@ -81,7 +80,7 @@ export default class userController {
 
       res.status(200).json(response);
     } catch (error) {
-      handleError(res, error);
+      next(error);
     }
   }
 
@@ -89,7 +88,7 @@ export default class userController {
    * DELETE /user/me
    * Delete authenticated user and all related data
    */
-  async delete(req: Request, res: Response): Promise<void> {
+  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const publicId = req.user?.publicId;
       if (!publicId) {
@@ -100,7 +99,7 @@ export default class userController {
 
       res.status(204).send();
     } catch (error) {
-      handleError(res, error);
+      next(error);
     }
   }
 }

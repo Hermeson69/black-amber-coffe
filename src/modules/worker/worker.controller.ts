@@ -3,12 +3,7 @@ import {
   GetWorkerResponseSchema,
   UpdateWorkerResponseSchema,
 } from "./worker.schema";
-import { Request, Response } from "express";
-import sharedHandlers from "@/shared/handlers/handles";
-
-function handleError(res: Response, err: unknown) {
-  return sharedHandlers.error(res, err);
-}
+import { NextFunction, Request, Response } from "express";
 
 export default class WorkerController {
   private workerService: WorkerService;
@@ -17,7 +12,11 @@ export default class WorkerController {
     this.workerService = workerService;
   }
 
-  async getById(req: Request, res: Response): Promise<void> {
+  async getById(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const publicId = req.user?.publicId;
       if (!publicId) {
@@ -32,18 +31,21 @@ export default class WorkerController {
 
       res.status(200).json(response);
     } catch (error) {
-      handleError(res, error);
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response): Promise<void> {
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const publicId = req.user?.publicId;
       if (!publicId) {
         res.status(401).json({ error: "Unauthorized" });
         return;
       }
-      const data = req.body;
+      const data = {
+        ...req.body,
+        fullName: req.body.fullName ?? req.body.name,
+      };
 
       const updatedWorker = await this.workerService.update(publicId, data);
 
@@ -54,11 +56,11 @@ export default class WorkerController {
 
       res.status(200).json(response);
     } catch (error) {
-      handleError(res, error);
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response): Promise<void> {
+  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const publicId = req.user?.publicId;
       if (!publicId) {
@@ -69,7 +71,7 @@ export default class WorkerController {
 
       res.status(204).send();
     } catch (error) {
-      handleError(res, error);
+      next(error);
     }
   }
 }
