@@ -35,6 +35,22 @@ export const WorkerUpdateInputSchema = z
     "At least one field must be provided for update",
   );
 
+export const WorkerUpdateRequestSchema = z
+  .object({
+    name: z.string().min(1, "Full name must not be empty").optional(),
+    fullName: z.string().min(1, "Full name must not be empty").optional(),
+    email: z.email("Invalid email address").optional(),
+    phone: z.string().min(1, "Phone must not be empty").optional(),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters long")
+      .optional(),
+  })
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    "At least one field must be provided for update",
+  );
+
 export const GetWorkerResponseSchema = z.object({
   data: WorkerResponseSchema,
 });
@@ -47,5 +63,6 @@ export const UpdateWorkerResponseSchema = z.object({
 export type WorkerProfile = z.infer<typeof WorkerProfileSchema>;
 export type Worker = z.infer<typeof WorkerResponseSchema>;
 export type WorkerUpdateInput = z.infer<typeof WorkerUpdateInputSchema>;
+export type WorkerUpdateRequest = z.infer<typeof WorkerUpdateRequestSchema>;
 export type GetWorkerResponse = z.infer<typeof GetWorkerResponseSchema>;
 export type UpdateWorkerResponse = z.infer<typeof UpdateWorkerResponseSchema>;
