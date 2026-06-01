@@ -6,7 +6,7 @@ import { env } from "@/config/env";
 import router from "@/routes/v1.route";
 import sharedHandlers from "@/shared/handlers/handles";
 const app = express();
-const PORT = env.PORT || 3000;
+const PORT = env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
