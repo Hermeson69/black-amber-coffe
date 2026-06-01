@@ -5,7 +5,7 @@ const healthRoutes = Router();
 
 /**
  * @swagger
- * /health:
+ * /api/health:
  *   get:
  *     summary: Verifica se a API esta online
  *     tags: [Health]

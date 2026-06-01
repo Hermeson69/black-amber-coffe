@@ -65,7 +65,7 @@ userRoutes.get("/user/me", AuthMiddleware, (req, res, next) =>
 
 /**
  * @swagger
- * /api/users/me:
+ * /api/users/update/me:
  *   put:
  *     summary: Atualizar perfil do usuário autenticado
  *     description: Atualiza o nome completo, email, telefone, senha e/ou foto de perfil do usuário autenticado.
@@ -160,7 +160,7 @@ userRoutes.put(
  *       404:
  *         description: User not found
  */
-userRoutes.delete("/user/delete/me", AuthMiddleware, (req, res, next) =>
+userRoutes.delete("/user/me", AuthMiddleware, (req, res, next) =>
   userCtrl.delete(req, res, next),
 );
 

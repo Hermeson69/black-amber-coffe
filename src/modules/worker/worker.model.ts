@@ -3,6 +3,7 @@ interface WorkerProfile {
   email: string;
   phone: string | null;
   avatarImage: string | null;
+  avatarBuffer?: Buffer | null;
   password?: string;
   createdAt: string;
   updatedAt: string;

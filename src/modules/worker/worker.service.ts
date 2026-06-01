@@ -1,5 +1,6 @@
 import WorkerRepository from "./worker.repository";
 import WorkerModel from "./worker.model";
+import { r2StorageProvider, imageService } from "@/infra/storage";
 import {
   WorkerUpdateInput,
   Worker,
@@ -70,7 +71,22 @@ export default class WorkerService {
     if (!worker) {
       throw new Error("WORKER_NOT_FOUND");
     }
+    let avatarImageUpdate: string | null = worker.profile.avatarImage;
+    
+    if (validatedData.profile.avatarBuffer) {
+      const processedImages = await imageService.processAvatar(
+        validatedData.profile.avatarBuffer,
+      );
+      const keys = imageService.generateAvatarKeys(publicId);
 
+      await r2StorageProvider.upload({
+        key: keys.large,
+        body: processedImages.large,
+        contentType: processedImages.contentType,
+      });
+
+      avatarImageUpdate = keys.large;
+    }
     let password = worker.profile.password;
     if (validatedData.password) {
       password = await SecurityUtils.hashPassword(validatedData.password);
@@ -88,7 +104,7 @@ export default class WorkerService {
         fullName: validatedData.fullName ?? worker.profile.fullName,
         email: validatedData.email ?? worker.profile.email,
         phone: validatedData.phone ?? worker.profile.phone,
-        avatarImage: worker.profile.avatarImage,
+        avatarImage: avatarImageUpdate,
         password,
         createdAt: worker.profile.createdAt,
         updatedAt: new Date().toISOString(),

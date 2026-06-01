@@ -95,6 +95,10 @@ export default class authService {
       throw new Error("INVALID_CREDENTIALS");
     }
 
+    if (authEntity.type !== "user") {
+      throw new Error("INVALID_CREDENTIALS");
+    }
+
     const accessToken = this.jwtService.generateToken({
       id: authEntity.user.id,
       email: authEntity.user.email,
@@ -112,7 +116,7 @@ export default class authService {
         user: {
           publicId: authEntity.user.publicId,
           email: authEntity.user.email,
-          userType: authEntity.type,
+          userType: "user",
           profile: {
             fullName: authEntity.user.name,
             phone: authEntity.user.phone ?? null,

@@ -7,7 +7,7 @@ import setupSwagger from "@/shared/swagger";
 
 const routes = Router();
 
-routes.use(healthRoutes);
+routes.use("/api",healthRoutes);
 routes.use("/api", authRoutes);
 routes.use("/api", userRoutes);
 routes.use("/api", workerRoutes);

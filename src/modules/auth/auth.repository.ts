@@ -3,12 +3,14 @@ import { eq } from "drizzle-orm";
 import { clients, profiles, workers, workerProfiles } from "@/db/schema";
 import { generateId } from "@/core/gereteId";
 import authModel from "@/modules/auth/auth.model";
+import { WorkerRole } from "@/core/enuns/workerRole";
 
 export type UserType = "user" | "worker";
 
 export interface AuthEntity {
   type: UserType;
   user: authModel;
+  role?: WorkerRole;
 }
 
 interface PasswordReset {
@@ -107,6 +109,7 @@ export default class authRepository {
       const { workers: worker, worker_profiles: profile } = workerResult[0];
       return {
         type: "worker",
+        role: worker.role,
         user: new authModel(
           worker.id,
           worker.publicId,
@@ -159,6 +162,7 @@ export default class authRepository {
       const { workers: worker, worker_profiles: profile } = workerResult[0];
       return {
         type: "worker",
+        role: worker.role,
         user: new authModel(
           worker.id,
           worker.publicId,
