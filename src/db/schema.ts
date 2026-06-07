@@ -86,10 +86,15 @@ export const products = pgTable("products", {
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
   publicId: text("public_id").notNull().unique(),
+  code: text("code").notNull().unique(), // PED-20260607-0001
   clientId: integer("client_id")
     .notNull()
     .references(() => clients.id),
-  totalAmount: numeric("total_amount", { precision: 10, scale: 2 }).notNull(),
+  updatedBy: integer("updated_by").references(() => workers.id),
+  totalAmount: numeric("total_amount", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
   status: orderStatusEnum("status").notNull(),
   observation: text("observation"),
   ...timestamps,
@@ -116,6 +121,19 @@ export const payments = pgTable("payments", {
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   method: text("method").notNull(),
   ...timestamps,
+});
+
+export const orderHistory = pgTable("order_history", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
+  changedBy: text("changed_by").notNull(),
+  previousStatus: orderStatusEnum("previous_status").notNull(),
+  newStatus: orderStatusEnum("new_status").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 });
 
 export const passwordResetTokens = pgTable("password_reset_tokens", {
