@@ -54,6 +54,26 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 404,
     message: "Funcionário não encontrado.",
   },
+  WORKER_INACTIVE: {
+    status: 403,
+    message: "Funcionário inativo.",
+  },
+  ORDER_NOT_FOUND: {
+    status: 404,
+    message: "Pedido não encontrado.",
+  },
+  INVALID_STATUS: {
+    status: 400,
+    message: "Status inválido.",
+  },
+  INVALID_STATUS_TRANSITION: {
+    status: 400,
+    message: "Transição de status inválida.",
+  },
+  PRODUCT_NOT_FOUND: {
+    status: 404,
+    message: "Produto não encontrado.",
+  },
 
   // Profile Errors
   PROFILE_NOT_FOUND: {
@@ -129,7 +149,6 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 400,
     message: "Pelo menos um campo deve ser fornecido para atualização.",
   },
-
 
   PASSWORD_RESET_CODE_EXPIRED: {
     status: 400,
