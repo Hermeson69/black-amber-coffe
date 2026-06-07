@@ -21,4 +21,8 @@ export class OrderStatus {
   static isValid (metod: string): metod is typeof OrderStatus.VALUES[number]{
     return OrderStatus.VALUES.includes(metod as any)
   }
+  
 }
+
+export type OrderStatusType =
+  ReturnType<typeof OrderStatus.values>[number];
