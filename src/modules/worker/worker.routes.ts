@@ -11,8 +11,8 @@ import {
 import { db } from "@/config/database";
 import authRepository from "@/modules/auth/auth.repository";
 import JWTservice from "@/core/jwt.service";
-import WorkerAuthService from "@/modules/worker/worker.auth.service";
-import WorkerAuthController from "@/modules/worker/worker.auth.controller";
+import WorkerAuthService from "@/modules/worker/auth/worker.auth.service";
+import WorkerAuthController from "@/modules/worker/auth/worker.auth.controller";
 
 const workerRoutes = Router();
 

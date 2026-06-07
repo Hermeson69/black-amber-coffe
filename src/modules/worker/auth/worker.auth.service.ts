@@ -6,7 +6,7 @@ import {
   WorkerLoginResponse,
   WorkerLoginResponseSchema,
   WorkerLoginSchema,
-} from "./worker.schema";
+} from "../worker.schema";
 
 export default class WorkerAuthService {
   private authRepository: authRepository;

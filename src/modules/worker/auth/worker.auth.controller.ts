@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import WorkerAuthService from "./worker.auth.service";
-import { WorkerLoginInput, WorkerLoginResponse } from "./worker.schema";
+import { WorkerLoginInput, WorkerLoginResponse } from "../worker.schema";
 
 export default class WorkerAuthController {
   private workerAuthService: WorkerAuthService;
