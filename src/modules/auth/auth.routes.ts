@@ -14,7 +14,7 @@ import authService from "@/modules/auth/auth.service";
 import authRepository from "@/modules/auth/auth.repository";
 import JWTservice from "@/core/jwt.service";
 import { db } from "@/config/database";
-import validationMiddleware from "@/shared/middleware/validation.middleware";
+import validationMiddleware from "@/shared/middlewares/validation.middleware";
 
 const authRoutes = Router();
 

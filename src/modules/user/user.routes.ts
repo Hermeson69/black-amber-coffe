@@ -5,7 +5,7 @@ import userRepository from "@/modules/user/user.repository";
 import authRepository from "@/modules/auth/auth.repository";
 import { AuthMiddleware } from "@/modules/auth/auth.middleware";
 import { avatarUploadMiddleware } from "@/shared/middlewares/upload.middleware";
-import validationMiddleware from "@/shared/middleware/validation.middleware";
+import validationMiddleware from "@/shared/middlewares/validation.middleware";
 import { UserUpdateRequestSchema } from "@/modules/user/user.schema";
 import { db } from "@/config/database";
 

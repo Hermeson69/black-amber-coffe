@@ -3,7 +3,7 @@ import WorkerController from "@/modules/worker/worker.controller";
 import WorkerService from "@/modules/worker/worker.service";
 import WorkerRepository from "@/modules/worker/worker.repository";
 import { AuthMiddleware } from "@/modules/auth/auth.middleware";
-import validationMiddleware from "@/shared/middleware/validation.middleware";
+import validationMiddleware from "@/shared/middlewares/validation.middleware";
 import {
   WorkerLoginSchema,
   WorkerUpdateRequestSchema,
