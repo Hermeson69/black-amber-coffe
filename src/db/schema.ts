@@ -113,6 +113,17 @@ export const orderItems = pgTable("order_items", {
   ...timestamps,
 });
 
+export const stocks = pgTable("stocks", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id")
+    .notNull()
+    .unique() 
+    .references(() => products.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").notNull().default(0),
+  minQuantity: integer("min_quantity").notNull().default(0), 
+  ...timestamps,
+});
+
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
   orderId: integer("order_id")
@@ -175,6 +186,21 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, { fields: [orderItems.orderId], references: [orders.id] }),
   product: one(products, {
     fields: [orderItems.productId],
+    references: [products.id],
+  }),
+}));
+
+
+export const productsRelations = relations(products, ({ one }) => ({
+  stock: one(stocks, {
+    fields: [products.id],
+    references: [stocks.productId],
+  }),
+}));
+
+export const stocksRelations = relations(stocks, ({ one }) => ({
+  product: one(products, {
+    fields: [stocks.productId],
     references: [products.id],
   }),
 }));
