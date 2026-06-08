@@ -5,7 +5,7 @@ export const WorkerProfileSchema = z.object({
   fullName: z.string(),
   phone: z.string().nullable(),
   avatarImage: z.string().nullable(),
-  avatarBuffer: z.instanceof(Buffer).nullable(),
+  avatarBuffer: z.instanceof(Buffer).nullable().optional(),
   email: z.email(),
   createdAt: z.string(),
   updatedAt: z.string(),
