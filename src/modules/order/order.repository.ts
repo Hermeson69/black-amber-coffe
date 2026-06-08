@@ -219,4 +219,16 @@ export default class OrderRepository {
       );
     });
   }
+
+  async cancelOrder(publicId: string): Promise<OrderModel | null> {
+    const [updatedRow] = await this.db
+      .update(orders)
+      .set({ status: OrderStatus.CANCELLED, updatedAt: new Date() })
+      .where(eq(orders.publicId, publicId))
+      .returning();
+
+    if (!updatedRow) return null;
+
+    return this.enrichOrder(updatedRow);
+  }
 }

@@ -127,6 +127,75 @@ orderRoutes.post(
 
 /**
  * @swagger
+ * /api/user/orders/{publicId}/cancel:
+ *   post:
+ *     summary: Cancelar um pedido do usuário autenticado
+ *     tags:
+ *       - Orders
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: publicId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Pedido cancelado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     publicId:
+ *                       type: string
+ *                     code:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                     totalPrice:
+ *                       type: number
+ *                     paymentMethod:
+ *                       type: string
+ *                       nullable: true
+ *                     observation:
+ *                       type: string
+ *                       nullable: true
+ *                     itens:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: number
+ *                           name:
+ *                             type: string
+ *                           price:
+ *                             type: number
+ *                           quantity:
+ *                             type: number
+ *                     createdAt:
+ *                       type: string
+ *                     updatedAt:
+ *                       type: string
+ *       401:
+ *         description: Não autorizado
+ *       404:
+ *         description: Pedido não encontrado
+ */
+
+orderRoutes.post(
+  "/user/orders/:publicId/cancel",
+  AuthMiddleware,
+  (req, res, next) => orderCtrl.cancelOrder(req, res, next),
+);
+
+/**
+ * @swagger
  * /api/user/orders:
  *   get:
  *     summary: Listar pedidos do usuário por status
@@ -268,10 +337,74 @@ orderRoutes.get(
  *       404:
  *         description: Pedido não encontrado
  */
-orderRoutes.get(
-  "/worker/orders/:publicId",
-  AuthMiddleware,
-  (req, res, next) => orderCtrl.getByPublicId(req, res, next),
+orderRoutes.get("/worker/orders/:publicId", AuthMiddleware, (req, res, next) =>
+  orderCtrl.getByPublicId(req, res, next),
+);
+
+/**
+ * @swagger
+ * /api/worker/orders:
+ *   get:
+ *     summary: Listar todos os pedidos (worker)
+ *     tags:
+ *       - Orders (Worker)
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de pedidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       publicId:
+ *                         type: string
+ *                       code:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                       totalPrice:
+ *                         type: number
+ *                       paymentMethod:
+ *                         type: string
+ *                         nullable: true
+ *                       observation:
+ *                         type: string
+ *                         nullable: true
+ *                       itens:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: number
+ *                             name:
+ *                               type: string
+ *                             price:
+ *                               type: number
+ *                             quantity:
+ *                               type: number
+ *                             observation:
+ *                               type: string
+ *                               nullable: true
+ *                       createdAt:
+ *                         type: string
+ *                       updatedAt:
+ *                         type: string
+ *       401:
+ *         description: Não autorizado
+ *       404:
+ *         description: Pedido não encontrado
+ */
+
+orderRoutes.get("/worker/orders", AuthMiddleware, (req, res, next) =>
+  orderCtrl.getallByWorker(req, res, next),
 );
 
 /**

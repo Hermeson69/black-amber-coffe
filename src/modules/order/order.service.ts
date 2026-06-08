@@ -104,6 +104,26 @@ export default class OrderService {
     });
   }
 
+  async cancelOrder(publicId: string): Promise<OrderModel | null> {
+    const order = await this.orderRepository.getbyPublicId(publicId);
+    if (!order) throw new Error("ORDER_NOT_FOUND");
+
+    if (order.status === OrderStatus.CANCELLED)
+      throw new Error("ORDER_ALREADY_CANCELLED");
+
+    const updated = await this.orderRepository.cancelOrder(publicId);
+    if (updated) {
+      await this.orderHistoryRepository.add(
+        updated.id,
+        "SYSTEM",
+        order.status,
+        OrderStatus.CANCELLED,
+      );
+    }
+
+    return updated;
+  }
+
   async getByStatus(
     data: GetOrdersByStatusRequest,
   ): Promise<GetOrdersByStatusResponse> {
@@ -180,5 +200,12 @@ export default class OrderService {
     }
 
     return updated;
+  }
+  ///Get all by worker
+  async getAll(workerPublicId: string): Promise<OrderModel[]> {
+    const user = await this.workerRepository.getByPublicId(workerPublicId);
+    if (!user) throw new Error("WORKER_NOT_FOUND");
+
+    return this.orderRepository.getAll();
   }
 }
