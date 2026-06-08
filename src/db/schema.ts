@@ -76,6 +76,7 @@ export const products = pgTable("products", {
   publicId: text("public_id").notNull().unique(),
   name: text("name").notNull(),
   description: text("description"),
+  img: text("img"),
   size: text("size"),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   category: text("category").notNull(),
