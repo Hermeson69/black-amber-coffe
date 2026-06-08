@@ -8,6 +8,7 @@ interface JWTPayload {
   email: string;
   publicId?: string;
   role?: string;
+  isAdmin?: boolean;
 }
 
 interface PasswordResetPayload {

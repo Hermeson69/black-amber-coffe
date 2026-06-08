@@ -39,6 +39,7 @@ export default class WorkerAuthService {
       id: authEntity.user.id,
       email: authEntity.user.email,
       publicId: authEntity.user.publicId,
+      isAdmin: authEntity.isAdmin,
     });
 
     const refreshToken = this.jwtService.generateRefreshToken(

@@ -192,24 +192,4 @@ workerRoutes.patch(
   (req, res, next) => workerCtrl.update(req, res, next),
 );
 
-/**
- * @swagger
- * /api/worker/delete/me:
- *   delete:
- *     summary: Delete authenticated worker
- *     tags: [Workers]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       204:
- *         description: User deleted successfully
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Worker not found
- */
-workerRoutes.delete("/worker/delete/me", AuthMiddleware, (req, res, next) =>
-  workerCtrl.delete(req, res, next),
-);
-
 export { workerRoutes };

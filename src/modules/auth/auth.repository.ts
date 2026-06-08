@@ -11,6 +11,7 @@ export interface AuthEntity {
   type: UserType;
   user: authModel;
   role?: WorkerRole;
+  isAdmin?: boolean;
 }
 
 interface PasswordReset {
@@ -110,6 +111,7 @@ export default class authRepository {
       return {
         type: "worker",
         role: worker.role,
+        isAdmin: worker.isAdmin,
         user: new authModel(
           worker.id,
           worker.publicId,
@@ -163,6 +165,7 @@ export default class authRepository {
       return {
         type: "worker",
         role: worker.role,
+        isAdmin: worker.isAdmin,
         user: new authModel(
           worker.id,
           worker.publicId,
