@@ -62,6 +62,10 @@ const errorMap: Record<string, { status: number; message: string }> = {
     status: 404,
     message: "Pedido não encontrado.",
   },
+  ORDER_ALREADY_CANCELLED: {
+    status: 400,
+    message: "O pedido já foi cancelado.",
+  },
   INVALID_STATUS: {
     status: 400,
     message: "Status inválido.",

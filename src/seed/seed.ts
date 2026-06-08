@@ -119,6 +119,7 @@ export async function seed() {
               role: worker.role,
               salary: "0",
               isActive: true,
+              isAdmin: worker.role === "ADMIN",
               createdAt: now,
               updatedAt: now,
             })),
@@ -157,6 +158,7 @@ export async function seed() {
                 role: seed.role,
                 salary: "0",
                 isActive: true,
+                isAdmin: seed.role === "ADMIN",
                 createdAt: now,
                 updatedAt: now,
               })
